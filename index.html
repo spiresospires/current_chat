@@ -1,1 +1,400 @@
-hlp
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FusionLive – Chat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: #333; }
+
+    /* ── Top brand bar ── */
+    .top-bar { background: #002060; color: #fff; text-align: right; padding: 5px 16px; font-weight: bold; font-size: 15px; letter-spacing: .5px; flex-shrink: 0; }
+
+    /* ── Header ── */
+    .header { background: #fff; border-bottom: 1px solid #ddd; padding: 0 16px; height: 52px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .logo { display: flex; align-items: center; gap: 5px; margin-right: 6px; }
+    .logo-text { font-weight: bold; color: #1a237e; font-size: 15px; letter-spacing: 1px; }
+    .workspace-select { border: 1px solid #aaa; padding: 4px 8px; font-size: 13px; border-radius: 3px; min-width: 165px; cursor: pointer; }
+    .search-wrap { display: flex; align-items: center; gap: 12px; flex: 1; margin-left: 10px; }
+    .search-box { position: relative; width: 270px; }
+    .search-box input { width: 100%; padding: 5px 10px 5px 28px; border: 1px solid #ccc; border-radius: 14px; font-size: 13px; outline: none; }
+    .search-box input:focus { border-color: #002060; }
+    .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: #888; font-size: 12px; }
+    .adv-search { color: #1565c0; text-decoration: none; font-size: 13px; white-space: nowrap; }
+    .header-icons { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+    .icon-btn { position: relative; cursor: pointer; display: flex; align-items: center; gap: 3px; color: #555; font-size: 13px; }
+    .badge { position: absolute; top: -5px; right: -7px; background: #1565c0; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+    /* ── Nav bar ── */
+    .nav-bar { background: #fff; border-bottom: 2px solid #e0e0e0; padding: 0 16px; display: flex; align-items: stretch; flex-shrink: 0; }
+    .nav-tab { display: flex; align-items: center; gap: 6px; padding: 10px 14px; cursor: pointer; color: #444; text-decoration: none; font-size: 13px; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: background .15s; }
+    .nav-tab:hover { background: #f4f6fb; color: #002060; }
+    .nav-tab.active { border-bottom-color: #002060; color: #002060; font-weight: bold; }
+    .nav-tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Main content ── */
+    .main { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── Left history panel ── */
+    .left-panel { width: 230px; min-width: 230px; background: #fff; border-right: 1px solid #dde2ef; display: flex; flex-direction: column; padding: 12px 10px; overflow-y: auto; flex-shrink: 0; }
+    .new-chat-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: #002060; color: #fff; border: none; border-radius: 6px; padding: 9px 12px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; transition: background .15s; }
+    .new-chat-btn:hover { background: #003399; }
+    .section-label { display: flex; align-items: center; gap: 6px; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin: 14px 0 6px; }
+    .section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: #e8e8e8; }
+    .hist-item { padding: 7px 9px; border-radius: 5px; cursor: pointer; border: 1px solid transparent; margin-bottom: 2px; }
+    .hist-item:hover { background: #f0f4ff; border-color: #c5cae9; }
+    .hist-item.active { background: #e8edf8; border-color: #9fa8da; }
+    .hist-title { font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hist-item.active .hist-title { font-weight: bold; color: #002060; }
+    .hist-date { font-size: 10px; color: #aaa; margin-top: 2px; }
+
+    /* ── Right chat panel ── */
+    .right-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8f9fb; }
+
+    /* messages */
+    .messages-area { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .msg { display: flex; flex-direction: column; max-width: 88%; }
+    .msg.user { align-self: flex-end; align-items: flex-end; }
+    .msg.bot { align-self: flex-start; align-items: flex-start; }
+    .msg-label { font-size: 10px; color: #aaa; margin-bottom: 4px; }
+    .bubble { padding: 11px 15px; border-radius: 10px; font-size: 13px; line-height: 1.55; }
+    .msg.user .bubble { background: #002060; color: #fff; border-bottom-right-radius: 3px; }
+    .msg.bot .bubble { background: #fff; border: 1px solid #dde2ef; border-bottom-left-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.06); width: 100%; }
+
+    /* reasoning badge */
+    .reasoning-tag { display: inline-flex; align-items: center; gap: 5px; background: #e8f0fe; color: #1a73e8; border: 1px solid #c5d8fc; border-radius: 12px; padding: 3px 10px; font-size: 11px; font-weight: 600; margin-bottom: 10px; }
+
+    /* response text */
+    .resp-summary { font-size: 13px; line-height: 1.65; color: #333; margin-bottom: 16px; }
+    .resp-summary strong { color: #002060; }
+
+    /* doc grid */
+    .grid-label { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
+    .doc-table { width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #dde2ef; border-radius: 6px; overflow: hidden; }
+    .doc-table th { background: #002060; color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; font-size: 11px; white-space: nowrap; }
+    .doc-table td { padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:nth-child(even) td { background: #f5f7fc; }
+    .doc-table tbody tr:hover td { background: #eef2ff; cursor: pointer; }
+    .doc-link { color: #1565c0; text-decoration: none; }
+    .doc-link:hover { text-decoration: underline; }
+    .status { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: bold; white-space: nowrap; }
+    .s-ifc  { background: #e8f5e9; color: #2e7d32; }
+    .s-afc  { background: #fff3e0; color: #e65100; }
+    .s-rev  { background: #e3f2fd; color: #1565c0; }
+    .s-sup  { background: #fce4ec; color: #b71c1c; }
+    .grid-footer { font-size: 11px; color: #888; margin-top: 8px; }
+
+    /* ── Input area ── */
+    .input-area { background: #fff; border-top: 1px solid #dde2ef; padding: 12px 20px 14px; flex-shrink: 0; }
+    .input-options { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+    .opt-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; cursor: pointer; user-select: none; }
+    .opt-label input[type=checkbox] { width: 14px; height: 14px; accent-color: #002060; cursor: pointer; }
+    .opt-hint { font-size: 11px; color: #aaa; }
+    .input-row { display: flex; gap: 10px; align-items: flex-end; }
+    textarea.chat-input { flex: 1; padding: 10px 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 13px; font-family: inherit; resize: none; min-height: 44px; max-height: 120px; line-height: 1.5; outline: none; }
+    textarea.chat-input:focus { border-color: #002060; box-shadow: 0 0 0 2px rgba(0,32,96,.1); }
+    .send-btn { background: #002060; color: #fff; border: none; padding: 0 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; height: 44px; white-space: nowrap; transition: background .15s; }
+    .send-btn:hover { background: #003399; }
+    .disclaimer { font-size: 10px; color: #ccc; text-align: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- Top brand bar -->
+<div class="top-bar">FusionLive</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <!-- idox cube icon (simplified) -->
+    <svg width="36" height="36" viewBox="0 0 36 36">
+      <polygon points="18,3 31,10 31,24 18,31 5,24 5,10" fill="#1a237e" opacity=".12"/>
+      <polygon points="18,3 31,10 18,17 5,10"  fill="#1a237e" opacity=".45"/>
+      <polygon points="5,10 18,17 18,31 5,24"  fill="#1a237e" opacity=".75"/>
+      <polygon points="31,10 31,24 18,31 18,17" fill="#1a237e"/>
+    </svg>
+    <span class="logo-text">idox</span>
+  </div>
+  <select class="workspace-select"><option>Ollies Workspace</option></select>
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" placeholder="Quick Search">
+    </div>
+    <a href="#" class="adv-search">Advanced Search</a>
+  </div>
+  <div class="header-icons">
+    <div class="icon-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <div class="badge">3</div>
+    </div>
+    <div class="icon-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div class="badge">5</div>
+    </div>
+    <div class="icon-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      &#9660;
+    </div>
+  </div>
+</div>
+
+<!-- Nav bar -->
+<div class="nav-bar">
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home
+  </a>
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documents
+  </a>
+  <a class="nav-tab active" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat
+  </a>
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0 1 13 0"/></svg>Activities
+  </a>
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts
+  </a>
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
+  </a>
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports
+  </a>
+  <a class="nav-tab" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administration
+  </a>
+</div>
+
+<!-- Main: Chat layout -->
+<div class="main">
+
+  <!-- Left: history panel -->
+  <div class="left-panel">
+    <button class="new-chat-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Chat
+    </button>
+
+    <div class="section-label">Recent</div>
+
+    <div class="hist-item active">
+      <div class="hist-title">P&amp;ID IFC Status Query</div>
+      <div class="hist-date">Today, 09:41</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">FPSO Topsides Drawing Register</div>
+      <div class="hist-date">Today, 08:15</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">HAZOP Action Item Docs</div>
+      <div class="hist-date">Yesterday, 16:30</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Subsea Pipeline Specs Rev D</div>
+      <div class="hist-date">Yesterday, 14:05</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Outstanding RFI List – Module 3</div>
+      <div class="hist-date">11 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Valve Datasheet Discrepancies</div>
+      <div class="hist-date">10 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Structural Calc Review Pack</div>
+      <div class="hist-date">09 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Commissioning Certificate Tracker</div>
+      <div class="hist-date">08 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">As-Built Document Handover</div>
+      <div class="hist-date">07 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Instrument Loop Drawings – AFC</div>
+      <div class="hist-date">04 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">Civil Foundations Spec Clash</div>
+      <div class="hist-date">03 Apr 2026</div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-title">MTO vs BOM Reconciliation</div>
+      <div class="hist-date">02 Apr 2026</div>
+    </div>
+  </div>
+
+  <!-- Right: chat panel -->
+  <div class="right-panel">
+
+    <!-- Messages -->
+    <div class="messages-area">
+
+      <!-- User question -->
+      <div class="msg user">
+        <div class="msg-label">You</div>
+        <div class="bubble">
+          Show me all P&amp;ID documents currently at IFC status for the FPSO Topsides package, and summarise any outstanding review comments.
+        </div>
+      </div>
+
+      <!-- AI response -->
+      <div class="msg bot">
+        <div class="msg-label">FusionLive AI</div>
+        <div class="bubble">
+
+          <div class="reasoning-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Reasoning
+          </div>
+
+          <div class="resp-summary">
+            I found <strong>9 P&amp;ID documents</strong> at <strong>Issued for Construction (IFC)</strong> status within the <strong>FPSO Topsides</strong> package. Of these, <strong>3 documents</strong> have open review comments that have not yet been resolved or formally closed. The most recent transmittal (TRN-2026-0142) issued on <strong>07 Apr 2026</strong> covered 4 drawings; two carry Contractor comments at Category B (minor) that require disposition before the next revision uplift. No Category A (hold) comments are currently open. All documents are accessible below — click any document number to open the file viewer.
+          </div>
+
+          <div class="grid-label">Matching Documents (9 of 9 shown)</div>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Document No.</th>
+                <th>Title</th>
+                <th>Rev</th>
+                <th>Status</th>
+                <th>Discipline</th>
+                <th>Doc Type</th>
+                <th>Issue Date</th>
+                <th>Transmittal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0001</a></td>
+                <td>Topsides Gas Compression – Train A P&amp;ID</td>
+                <td>C</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>07 Apr 2026</td>
+                <td>TRN-2026-0142</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0002</a></td>
+                <td>Topsides Gas Compression – Train B P&amp;ID</td>
+                <td>C</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>07 Apr 2026</td>
+                <td>TRN-2026-0142</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0007</a></td>
+                <td>HP Flare Header &amp; Knockout Drum</td>
+                <td>D</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>01 Apr 2026</td>
+                <td>TRN-2026-0138</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0011</a></td>
+                <td>Produced Water Treatment P&amp;ID</td>
+                <td>B</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>28 Mar 2026</td>
+                <td>TRN-2026-0131</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0015</a></td>
+                <td>Topsides Seawater Lift Pumps</td>
+                <td>C</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>25 Mar 2026</td>
+                <td>TRN-2026-0129</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0018</a></td>
+                <td>Chemical Injection Skid – Corrosion Inhibitor</td>
+                <td>B</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>20 Mar 2026</td>
+                <td>TRN-2026-0124</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-P-PID-0022</a></td>
+                <td>Export Metering &amp; Custody Transfer P&amp;ID</td>
+                <td>D</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Piping</td>
+                <td>Drawing</td>
+                <td>18 Mar 2026</td>
+                <td>TRN-2026-0121</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-I-PID-0003</a></td>
+                <td>Emergency Shutdown System – Logic P&amp;ID</td>
+                <td>C</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Instrumentation</td>
+                <td>Drawing</td>
+                <td>14 Mar 2026</td>
+                <td>TRN-2026-0115</td>
+              </tr>
+              <tr>
+                <td><a class="doc-link" href="#">FPU-I-PID-0009</a></td>
+                <td>Gas Detection &amp; HVAC Isolation P&amp;ID</td>
+                <td>B</td>
+                <td><span class="status s-ifc">IFC</span></td>
+                <td>Instrumentation</td>
+                <td>Drawing</td>
+                <td>10 Mar 2026</td>
+                <td>TRN-2026-0109</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="grid-footer">3 documents have open review comments &nbsp;|&nbsp; Last updated: 13 Apr 2026 09:41</div>
+
+        </div>
+      </div>
+
+    </div><!-- /messages-area -->
+
+    <!-- Input area -->
+    <div class="input-area">
+      <div class="input-options">
+        <label class="opt-label">
+          <input type="checkbox" id="reasoningCheck" checked>
+          Reasoning
+        </label>
+        <span class="opt-hint">Enables deeper analysis — may take a few seconds longer</span>
+      </div>
+      <div class="input-row">
+        <textarea class="chat-input" rows="1" placeholder="Ask a question about your documents, transmittals, or metadata…"></textarea>
+        <button class="send-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send
+        </button>
+      </div>
+      <div class="disclaimer">FusionLive AI can make mistakes. Always verify results against source documents.</div>
+    </div>
+
+  </div><!-- /right-panel -->
+
+</div><!-- /main -->
+
+</body>
+</html>
