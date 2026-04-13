@@ -91,3 +91,59 @@ textarea.chat-input:focus { border-color: #002060; box-shadow: 0 0 0 2px rgba(0,
 .send-btn { background: #002060; color: #fff; border: none; padding: 0 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px; height: 44px; white-space: nowrap; transition: background .15s; flex-shrink: 0; }
 .send-btn:hover { background: #003399; }
 .disclaimer { font-size: 10px; color: #ccc; text-align: center; margin-top: 8px; }
+
+/* ── Conversation item actions ── */
+.hist-item { position: relative; }
+.hist-title { padding-right: 18px; }
+
+.hist-menu-btn {
+  position: absolute;
+  top: 50%; right: 5px;
+  transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: #888; padding: 2px 3px; border-radius: 3px;
+  font-size: 15px; line-height: 1; opacity: 0;
+  transition: opacity .15s, background .15s;
+  display: flex; align-items: center;
+}
+.hist-item:hover .hist-menu-btn,
+.hist-menu-btn.open { opacity: 1; }
+.hist-menu-btn:hover { background: #d8dff5; color: #002060; }
+
+.hist-dropdown {
+  display: none;
+  position: absolute; right: 0; top: calc(100% + 2px);
+  z-index: 200; background: #fff;
+  border: 1px solid #dde2ef; border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.13);
+  min-width: 152px; padding: 4px 0;
+}
+.hist-dropdown.open { display: block; }
+.hist-dropdown button {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 7px 12px;
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; font-family: inherit;
+  color: #333; text-align: left;
+  transition: background .12s; white-space: nowrap;
+}
+.hist-dropdown button:hover { background: #f0f4ff; color: #002060; }
+.hist-dropdown button.danger { color: #c62828; }
+.hist-dropdown button.danger:hover { background: #fce4ec; color: #b71c1c; }
+.hist-dropdown-divider { border: none; border-top: 1px solid #eee; margin: 3px 0; }
+
+.hist-edit {
+  width: 100%; font-size: 12px; font-family: inherit;
+  border: 1px solid #9fa8da; border-radius: 3px;
+  padding: 1px 4px; outline: none;
+  background: #fff; color: #002060; font-weight: bold;
+}
+
+.pin-badge {
+  position: absolute; top: 50%; right: 5px;
+  transform: translateY(-50%);
+  color: #7986cb; display: none;
+  align-items: center; pointer-events: none;
+}
+.hist-item.pinned .pin-badge { display: flex; }
+.hist-item.pinned:hover .pin-badge { display: none; }
