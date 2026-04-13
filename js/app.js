@@ -217,4 +217,143 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupHistItemActions();
 
+  // ── Doc table row actions ─────────────────────────────────────
+  initDocTableActions();
+
+  function initDocTableActions() {
+    document.querySelectorAll('.doc-table tbody tr').forEach(row => {
+      // Build the data object from the row cells
+      const cells = row.querySelectorAll('td');
+      const docData = {
+        ref:       cells[0] ? cells[0].textContent.trim() : '',
+        title:     cells[1] ? cells[1].textContent.trim() : '',
+        rev:       cells[2] ? cells[2].textContent.trim() : '',
+        status:    cells[3] ? cells[3].textContent.trim() : '',
+        discipline:cells[4] ? cells[4].textContent.trim() : '',
+        docType:   cells[5] ? cells[5].textContent.trim() : '',
+        issueDate: cells[6] ? cells[6].textContent.trim() : '',
+        transmittal: cells[7] ? cells[7].textContent.trim() : '',
+      };
+
+      // Create actions cell
+      const td = document.createElement('td');
+      td.className = 'td-actions';
+      td.innerHTML = `
+        <button class="row-act-btn" data-row-action="properties" title="Properties">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </button>
+        <button class="row-act-btn" data-row-action="view" title="View">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+        <button class="row-act-btn danger" data-row-action="delete" title="Delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>`;
+      row.appendChild(td);
+
+      td.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-row-action]');
+        if (!btn) return;
+        e.stopPropagation();
+        const action = btn.dataset.rowAction;
+        if (action === 'properties') openDocProps(docData, row);
+        else if (action === 'view')  openDocView(docData);
+        else if (action === 'delete') deleteDocRow(row, docData);
+      });
+    });
+  }
+
+  // ── Document Properties modal ─────────────────────────────────
+  const docPropsModal = document.getElementById('docPropsModal');
+  document.getElementById('docPropsClose').addEventListener('click', () => {
+    docPropsModal.style.display = 'none';
+  });
+  docPropsModal.addEventListener('click', (e) => {
+    if (e.target === docPropsModal) docPropsModal.style.display = 'none';
+  });
+
+  function openDocProps(doc, row) {
+    // Populate tab labels
+    document.getElementById('dprop-doc-tab-label').textContent = doc.ref + ' – ' + doc.title;
+    document.getElementById('dprop-folder-tab-label').textContent = 'FPSO Topsides / ' + doc.discipline + ' / P&IDs';
+
+    // Populate fields
+    document.getElementById('dp-filename').textContent  = doc.ref + '.pdf';
+    document.getElementById('dp-reference').textContent = doc.ref;
+    document.getElementById('dp-title').value           = doc.title;
+
+    // Set revision dropdown
+    const revSel = document.getElementById('dp-revision');
+    [...revSel.options].forEach(o => { o.selected = o.value === doc.rev; });
+
+    // Set RFI dropdown based on status
+    const rfiSel = document.getElementById('dp-rfi');
+    const rfiMap = { IFC: 'IFC – Issued for Construction', AFC: 'AFC – Approved for Construction', IFR: 'IFR – Issued for Review' };
+    [...rfiSel.options].forEach(o => { o.selected = o.value === (rfiMap[doc.status] || '—'); });
+
+    document.getElementById('dp-pmstatus').textContent = doc.status;
+
+    // Version history row
+    const vhBody = document.getElementById('dp-vh-body');
+    vhBody.innerHTML = `
+      <tr>
+        <td><input type="checkbox"></td>
+        <td>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </td>
+        <td>${escapeHtml(doc.ref)}</td>
+        <td><a href="#">${escapeHtml(doc.title)}</a></td>
+        <td>${escapeHtml(doc.rev)}</td>
+        <td>${escapeHtml(doc.status)}</td>
+        <td>Spires, Oliver</td>
+        <td>Idox Group</td>
+        <td>${escapeHtml(doc.issueDate)}</td>
+        <td>1.0, CURR…</td>
+        <td>—</td>
+      </tr>`;
+    document.getElementById('dp-vh-count').textContent = 'Displaying 1 - 1 of 1';
+
+    // Section toggles
+    docPropsModal.querySelectorAll('.dprop-section-hdr').forEach(hdr => {
+      hdr.onclick = () => {
+        hdr.classList.toggle('dprop-section-open');
+        const caret = hdr.querySelector('.dprop-caret');
+        if (caret) caret.classList.toggle('dprop-caret-closed');
+      };
+    });
+
+    docPropsModal.style.display = 'flex';
+  }
+
+  // ── View modal ────────────────────────────────────────────────
+  const viewModal = document.getElementById('viewModal');
+  document.getElementById('viewModalClose').addEventListener('click', () => {
+    viewModal.style.display = 'none';
+  });
+  viewModal.addEventListener('click', (e) => {
+    if (e.target === viewModal) viewModal.style.display = 'none';
+  });
+
+  function openDocView(doc) {
+    document.getElementById('view-title').textContent  = doc.ref + ' – ' + doc.title;
+    document.getElementById('view-doc-label').textContent = doc.ref + '.pdf  (Rev ' + doc.rev + ')';
+    viewModal.style.display = 'flex';
+  }
+
+  // ── Delete row ────────────────────────────────────────────────
+  function deleteDocRow(row, doc) {
+    if (!confirm('Delete "' + doc.ref + ' – ' + doc.title + '" from results?')) return;
+    row.style.transition = 'opacity .25s';
+    row.style.opacity = '0';
+    setTimeout(() => row.remove(), 260);
+  }
+
 });

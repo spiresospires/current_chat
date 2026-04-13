@@ -179,6 +179,7 @@
                 <th>Doc Type</th>
                 <th>Issue Date</th>
                 <th>Transmittal</th>
+                <th class="th-actions"></th>
               </tr>
             </thead>
             <tbody>
@@ -303,6 +304,238 @@
   </div><!-- /right-panel -->
 
 </div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════════
+     Document Properties Modal
+═══════════════════════════════════════════════════════ -->
+<div class="dprop-overlay" id="docPropsModal" aria-modal="true" role="dialog" style="display:none">
+  <div class="dprop-panel">
+
+    <!-- Tab bar -->
+    <div class="dprop-tabs">
+      <div class="dprop-tab" id="dprop-folder-tab">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span id="dprop-folder-tab-label">FPSO Topsides / Piping / P&amp;IDs</span>
+      </div>
+      <div class="dprop-tab dprop-tab-active" id="dprop-doc-tab">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span id="dprop-doc-tab-label">Document</span>
+        <button class="dprop-tab-close" id="docPropsClose" aria-label="Close">&times;</button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="dprop-body">
+
+      <!-- Left: folder tree -->
+      <div class="dprop-tree">
+        <div class="dtree-search">
+          <span class="search-icon" style="left:8px">&#128269;</span>
+          <input type="text" placeholder="Search Folder">
+        </div>
+        <ul class="dtree-root">
+          <li class="dtree-item dtree-special">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="goldenrod" stroke="goldenrod" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Favourites
+          </li>
+          <li class="dtree-item dtree-special">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Favourite Searches
+          </li>
+          <li class="dtree-item dtree-special">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            My Checked-Out Documents
+          </li>
+          <li class="dtree-item dtree-folder dtree-open">
+            <span class="dtree-caret">&#9660;</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Ollies Workspace
+            <ul class="dtree-children">
+              <li class="dtree-item dtree-folder dtree-open" id="dtree-active-folder">
+                <span class="dtree-caret">&#9660;</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                FPSO Topsides
+                <ul class="dtree-children">
+                  <li class="dtree-item dtree-folder dtree-open" id="dtree-piping-folder">
+                    <span class="dtree-caret">&#9660;</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Piping
+                    <ul class="dtree-children">
+                      <li class="dtree-item dtree-folder dtree-selected">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        P&amp;IDs
+                      </li>
+                      <li class="dtree-item dtree-folder">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        Line Lists
+                      </li>
+                      <li class="dtree-item dtree-folder">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        Isometrics
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="dtree-item dtree-folder">
+                    <span class="dtree-caret">&#9658;</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Instrumentation
+                  </li>
+                  <li class="dtree-item dtree-folder">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Structural
+                  </li>
+                  <li class="dtree-item dtree-folder">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Mechanical
+                  </li>
+                  <li class="dtree-item dtree-folder">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Commissioning
+                  </li>
+                </ul>
+              </li>
+              <li class="dtree-item dtree-folder">
+                <span class="dtree-caret">&#9658;</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                Subsea
+              </li>
+              <li class="dtree-item dtree-folder">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#e8a000" stroke="#c88000" stroke-width="1"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                Handover
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right: document properties -->
+      <div class="dprop-content">
+
+        <!-- Toolbar -->
+        <div class="dprop-toolbar">
+          <button class="dprop-tbtn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Document Info
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="dprop-tbtn dprop-tbtn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Update
+          </button>
+          <button class="dprop-tbtn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Secure Link
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <!-- Scrollable properties -->
+        <div class="dprop-scroll">
+          <h2 class="dprop-heading">Document Information</h2>
+
+          <!-- Basic Information -->
+          <div class="dprop-section">
+            <div class="dprop-section-hdr dprop-section-open">
+              <svg class="dprop-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+              Basic Information
+            </div>
+            <div class="dprop-section-body">
+              <div class="dprop-grid">
+                <div class="dprop-label">Filename</div>
+                <div class="dprop-value" id="dp-filename">—</div>
+                <div class="dprop-label">Reference</div>
+                <div class="dprop-value" id="dp-reference">—</div>
+                <div class="dprop-label">Title <span class="dprop-req">*</span></div>
+                <div class="dprop-value"><input class="dprop-input" id="dp-title" type="text" value="—"></div>
+                <div class="dprop-label">Revision</div>
+                <div class="dprop-value">
+                  <select class="dprop-select" id="dp-revision"><option>—</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                </div>
+                <div class="dprop-label">Reason For Issue</div>
+                <div class="dprop-value">
+                  <select class="dprop-select" id="dp-rfi"><option>—</option><option>IFC – Issued for Construction</option><option>AFC – Approved for Construction</option><option>IFR – Issued for Review</option><option>IFI – Issued for Information</option></select>
+                </div>
+                <div class="dprop-label">Due Date</div>
+                <div class="dprop-value"><input class="dprop-input dprop-date" id="dp-due" type="date"></div>
+                <div class="dprop-label">PM Status</div>
+                <div class="dprop-value dprop-status-val" id="dp-pmstatus">IFC</div>
+                <div class="dprop-label">Category</div>
+                <div class="dprop-value" id="dp-category">Engineering Document</div>
+                <div class="dprop-label">External URL</div>
+                <div class="dprop-value"><button class="dprop-change-btn">Change</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Details -->
+          <div class="dprop-section">
+            <div class="dprop-section-hdr">
+              <svg class="dprop-caret dprop-caret-closed" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+              Upload Details
+            </div>
+          </div>
+
+          <!-- Version History -->
+          <div class="dprop-section">
+            <div class="dprop-section-hdr dprop-section-open">
+              <svg class="dprop-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+              Version History
+            </div>
+            <div class="dprop-section-body">
+              <div class="dprop-vh-toolbar">
+                <button class="dprop-vh-btn" title="Add to briefcase">&#128452; Add to briefcase</button>
+                <button class="dprop-vh-btn" title="Delete">&#128465; Delete</button>
+                <button class="dprop-vh-btn" title="Download">&#8595; Download</button>
+                <button class="dprop-vh-btn" title="View">&#128065; View</button>
+              </div>
+              <table class="dprop-vh-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox"></th>
+                    <th></th>
+                    <th>Reference</th>
+                    <th>Title</th>
+                    <th>Revision</th>
+                    <th>Reason For Issue</th>
+                    <th>User Name</th>
+                    <th>Company</th>
+                    <th>Uploaded</th>
+                    <th>Ver.</th>
+                    <th>Decision Code</th>
+                  </tr>
+                </thead>
+                <tbody id="dp-vh-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+              <div class="dprop-pager">Page <input type="text" value="1" style="width:32px;text-align:center"> of 1 &nbsp;
+                <span style="float:right" id="dp-vh-count">Displaying 1 - 1 of 1</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /dprop-scroll -->
+      </div><!-- /dprop-content -->
+    </div><!-- /dprop-body -->
+  </div><!-- /dprop-panel -->
+</div><!-- /docPropsModal -->
+
+<!-- View modal (simple lightbox) -->
+<div class="view-overlay" id="viewModal" style="display:none">
+  <div class="view-panel">
+    <div class="view-header">
+      <span id="view-title">Document Viewer</span>
+      <button class="view-close" id="viewModalClose">&times;</button>
+    </div>
+    <div class="view-body">
+      <div class="view-placeholder">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <p id="view-doc-label">Document preview would load here</p>
+        <span>PDF / DWG viewer integration point</span>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="js/app.js"></script>
 </body>
