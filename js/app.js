@@ -292,6 +292,8 @@ FusionLive.HistoryPanel = Ext.extend(Ext.Panel, {
         var me = this;
         var isPinned = itemEl.hasClass('fl-hist-pinned');
         var menu = new Ext.menu.Menu({
+            cls: 'fl-hist-menu',
+            shadow: false,
             items: [
                 { text: 'Rename', handler: function () { me.renameItem(itemEl); } },
                 { text: isPinned ? 'Unpin' : 'Pin to top', handler: function () { me.togglePin(itemEl); } },

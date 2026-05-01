@@ -65,6 +65,19 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-hist-menu-btn:hover { background: #002060 !important; color: #fff !important; border-color: #002060 !important; }
 .fl-menu-danger { color: #c62828 !important; }
 
+/* ── Custom history menu (overrides Ext 3 default look) ────────── */
+.fl-hist-menu.x-menu { background: #fff !important; border: 1px solid #e0e3eb !important; border-radius: 8px !important; box-shadow: 0 6px 18px rgba(0,0,0,.12) !important; padding: 6px !important; min-width: 160px; }
+.fl-hist-menu .x-menu-list { background: transparent !important; padding: 0 !important; border: none !important; }
+.fl-hist-menu .x-menu-list-item { background: transparent !important; border: none !important; }
+.fl-hist-menu .x-menu-item { display: flex !important; align-items: center; gap: 8px; padding: 7px 12px !important; border-radius: 5px !important; color: #333 !important; font-size: 12px !important; font-family: Arial, Helvetica, sans-serif !important; background: transparent !important; border: none !important; line-height: 1.4 !important; }
+.fl-hist-menu .x-menu-item:hover, .fl-hist-menu .x-menu-item-active { background: #eef2ff !important; color: #002060 !important; text-decoration: none !important; }
+.fl-hist-menu .x-menu-item-icon { display: none !important; }
+.fl-hist-menu .x-menu-item-text { padding: 0 !important; }
+.fl-hist-menu .x-menu-sep-li { padding: 4px 0 !important; }
+.fl-hist-menu .x-menu-sep { display: block !important; height: 1px !important; background: #eef0f6 !important; margin: 0 6px !important; border: none !important; }
+.fl-hist-menu .fl-menu-danger { color: #c62828 !important; }
+.fl-hist-menu .fl-menu-danger:hover { background: #fdecec !important; color: #c62828 !important; }
+
 /* ── Right panel: grey chat container background ─────────────── */
 .fl-right-panel, .fl-right-panel .x-panel-body, .fl-right-panel .x-panel-bwrap { background: #f8f9fb; }
 
