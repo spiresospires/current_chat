@@ -7,7 +7,7 @@
 
 /* ── Page chrome (top-bar, header, nav) ───────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
-body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #f0f2f5; margin: 0; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #fff; margin: 0; }
 
 .top-bar { background: #002060; color: #fff; text-align: right; padding: 5px 16px; font-weight: bold; font-size: 15px; letter-spacing: .5px; }
 
@@ -47,7 +47,7 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 }
 
 /* ── History panel ─────────────────────────────────────────────── */
-.fl-history-panel { background: #fff; padding: 12px 10px; overflow-y: auto; }
+.fl-history-panel, .fl-history-panel .x-panel-body { background: #fff; overflow-y: auto; }
 .fl-new-chat-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: #002060; color: #fff; border: none; border-radius: 6px; padding: 9px 12px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
 .fl-new-chat-btn:hover { background: #003399; }
 .fl-section-label { display: flex; align-items: center; gap: 6px; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin: 14px 0 6px; }
@@ -55,21 +55,33 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-hist-item { padding: 7px 9px; border-radius: 5px; cursor: pointer; border: 1px solid transparent; margin-bottom: 2px; position: relative; }
 .fl-hist-item:hover { background: #f0f4ff; border-color: #c5cae9; }
 .fl-hist-active { background: #e8edf8 !important; border-color: #9fa8da !important; }
-.fl-hist-title { font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 18px; }
+.fl-hist-title { font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 24px; }
 .fl-hist-active .fl-hist-title { font-weight: bold; color: #002060; }
-.fl-hist-date { font-size: 10px; color: #aaa; margin-top: 2px; }
-.fl-hist-menu-btn { position: absolute; top: 50%; right: 5px; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #888; padding: 2px 3px; border-radius: 3px; font-size: 15px; line-height: 1; opacity: 0; }
-.fl-hist-item:hover .fl-hist-menu-btn { opacity: 1; }
-.fl-hist-menu-btn:hover { background: #d8dff5; color: #002060; }
+.fl-hist-date { font-size: 10px; color: #aaa; margin-top: 2px; padding-right: 24px; }
+.fl-hist-menu-btn svg { display: block; pointer-events: none; }
+.fl-hist-menu-btn { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); background: #eef0f6; border: 1px solid #d0d4e0; cursor: pointer; color: #555; padding: 0; border-radius: 4px; line-height: 1; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.fl-hist-item:hover .fl-hist-menu-btn { background: #fff; color: #002060; border-color: #9fa8da; }
+.fl-hist-active .fl-hist-menu-btn { background: #fff; color: #002060; border-color: #9fa8da; }
+.fl-hist-menu-btn:hover { background: #002060 !important; color: #fff !important; border-color: #002060 !important; }
 .fl-menu-danger { color: #c62828 !important; }
 
-/* ── Messages area ─────────────────────────────────────────────── */
-.fl-messages-area { padding: 24px 28px 130px; background: #f8f9fb; overflow-y: auto; }
-.fl-msg { display: flex; flex-direction: column; max-width: 88%; margin-bottom: 20px; }
+/* ── Right panel: grey chat container background ─────────────── */
+.fl-right-panel, .fl-right-panel .x-panel-body, .fl-right-panel .x-panel-bwrap { background: #f8f9fb; }
+
+/* ── Border-layout container background override ────────────── */
+.fl-chat-panel .x-border-layout-ct { background: #fff !important; }
+
+/* ── Border-layout splitter: thin grey line ──────────────────── */
+.fl-chat-panel .x-layout-split-west { width: 4px !important; background: #e0e3eb !important; border: none !important; }
+.fl-chat-panel .x-layout-split-west:hover, .fl-chat-panel .x-layout-split-west.x-layout-split-active { background: #c5cae9 !important; }
+
+/* ── Messages area ────────────────────────────────────────────── */
+.fl-messages-area, .fl-messages-area .x-panel-body { background: #f8f9fb; }
+.fl-msg { display: flex; flex-direction: column; max-width: 88%; min-width: 0; margin-bottom: 20px; }
 .fl-msg-user { align-self: flex-end; align-items: flex-end; margin-left: auto; }
 .fl-msg-bot  { align-self: flex-start; align-items: flex-start; }
 .fl-msg-label { font-size: 10px; color: #aaa; margin-bottom: 4px; }
-.fl-bubble { padding: 11px 15px; border-radius: 10px; font-size: 13px; line-height: 1.55; }
+.fl-bubble { padding: 11px 15px; border-radius: 10px; font-size: 13px; line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; max-width: 100%; }
 .fl-msg-user .fl-bubble { background: #002060; color: #fff; border-bottom-right-radius: 3px; }
 .fl-msg-bot  .fl-bubble { background: #fff; border: 1px solid #dde2ef; border-bottom-left-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.06); width: 100%; }
 

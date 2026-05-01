@@ -229,6 +229,7 @@ FusionLive.HistoryPanel = Ext.extend(Ext.Panel, {
     initComponent: function () {
         Ext.apply(this, {
             cls:        'fl-history-panel',
+            bodyStyle:  'background:#fff;padding:12px 10px;',
             border:     false,
             autoScroll: true,
             width:      230,
@@ -260,7 +261,7 @@ FusionLive.HistoryPanel = Ext.extend(Ext.Panel, {
         return '<div class="fl-hist-item' + activeCls + pinnedCls + '" data-hist-id="' + item.id + '">' +
                '<div class="fl-hist-title">' + Ext.util.Format.htmlEncode(item.title) + '</div>' +
                '<div class="fl-hist-date">'  + Ext.util.Format.htmlEncode(item.date)  + '</div>' +
-               '<button class="fl-hist-menu-btn" title="Options">&#8942;</button>' +
+               '<button class="fl-hist-menu-btn" title="Options" type="button"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.6"/><circle cx="8" cy="8" r="1.6"/><circle cx="13" cy="8" r="1.6"/></svg></button>' +
                '</div>';
     },
 
@@ -388,6 +389,7 @@ FusionLive.MessagesPanel = Ext.extend(Ext.Panel, {
     initComponent: function () {
         Ext.apply(this, {
             cls:        'fl-messages-area',
+            bodyStyle:  'padding:24px 28px 130px;background:#f8f9fb;',
             border:     false,
             autoScroll: true,
             html:       this.initialHtml
@@ -519,6 +521,7 @@ FusionLive.RightPanel = Ext.extend(Ext.Panel, {
 
     layout: 'fit',
     border: false,
+    cls:    'fl-right-panel',
 
     initComponent: function () {
         this.messagesPanel = new FusionLive.MessagesPanel({});
