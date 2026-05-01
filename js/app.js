@@ -360,12 +360,27 @@ FusionLive.MessagesPanel = Ext.extend(Ext.Panel, {
         '  <div class="fl-bubble">',
         '    <span class="fl-reasoning-tag">&#9432; Reasoning</span>',
         '    <div class="fl-resp-summary">',
-        '      I found <strong>9 P&amp;ID documents</strong> at <strong>Issued for Construction (IFC)</strong> status within the <strong>FPSO Topsides</strong> package.',
-        '      Of these, <strong>3 documents</strong> have open review comments. The most recent transmittal (TRN-2026-0142) issued on <strong>07 Apr 2026</strong>',
-        '      covered 4 drawings; two carry Contractor comments at Category B (minor) that require disposition before the next revision uplift.',
+        '      I found <strong>9 P&amp;ID documents</strong> at <strong>Issued for Construction (IFC)</strong> status within the',
+        '      <strong>FPSO Topsides</strong> package. Of these, <strong>3 documents</strong> have open review comments.',
+        '      The most recent transmittal (TRN-2026-0142) issued on <strong>07 Apr 2026</strong> covered 4 drawings;',
+        '      two carry Contractor comments at Category B (minor) that require disposition before the next revision uplift.',
         '      No Category A (hold) comments are currently open.',
         '    </div>',
-        '    <div id="fl-doc-grid-ct" style="margin-top:10px"></div>',
+        '    <div class="fl-doc-links">',
+        '      <div class="fl-doc-links-label">Matching documents (9)</div>',
+        '      <ul class="fl-doc-list">',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0001</a> &ndash; Topsides Gas Compression &ndash; Train A P&amp;ID <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0002</a> &ndash; Topsides Gas Compression &ndash; Train B P&amp;ID <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0003</a> &ndash; Topsides Gas Compression &ndash; Train C P&amp;ID <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0004</a> &ndash; Topsides Gas Compression &ndash; Train D P&amp;ID <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0007</a> &ndash; HP Flare Header &amp; Knockout Drum <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0011</a> &ndash; Produced Water Treatment P&amp;ID <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0015</a> &ndash; Topsides Seawater Lift Pumps <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-P-PID-0018</a> &ndash; Chemical Injection Skid &ndash; Corrosion Inhibitor <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '        <li><a class="fl-doc-link" href="#">FPU-I-PID-0003</a> &ndash; Emergency Shutdown System &ndash; Logic P&amp;ID <span class="fl-status fl-status-ifc">IFC</span></li>',
+        '      </ul>',
+        '      <div class="fl-grid-footer">3 documents have open review comments &nbsp;&bull;&nbsp; Last updated: 13 Apr 2026 09:41</div>',
+        '    </div>',
         '  </div>',
         '</div>'
     ].join(''),
@@ -378,17 +393,6 @@ FusionLive.MessagesPanel = Ext.extend(Ext.Panel, {
             html:       this.initialHtml
         });
         FusionLive.MessagesPanel.superclass.initComponent.call(this);
-    },
-
-    afterRender: function () {
-        FusionLive.MessagesPanel.superclass.afterRender.call(this);
-        this.renderDocGrid();
-    },
-
-    renderDocGrid: function () {
-        var ct = this.el.child('#fl-doc-grid-ct');
-        if (!ct) { return; }
-        this.docGrid = new FusionLive.DocGrid({ height: 260, renderTo: ct, border: true });
     },
 
     appendUserMessage: function (text) {
@@ -417,7 +421,6 @@ FusionLive.MessagesPanel = Ext.extend(Ext.Panel, {
 
     reset: function () {
         this.el.update(this.initialHtml);
-        this.renderDocGrid();
     }
 });
 Ext.reg('fl-messagespanel', FusionLive.MessagesPanel);
@@ -429,83 +432,118 @@ Ext.reg('fl-messagespanel', FusionLive.MessagesPanel);
 FusionLive.InputPanel = Ext.extend(Ext.Panel, {
 
     initComponent: function () {
-
-        this.reasoningCb = new Ext.form.Checkbox({
-            boxLabel: 'Reasoning',
-            checked:  true
-        });
-
-        this.chatInput = new Ext.form.TextArea({
-            emptyText: 'Ask a question about your documents, transmittals, or metadata\u2026',
-            grow:      true,
-            growMin:   44,
-            growMax:   120,
-            cls:       'fl-chat-input',
-            flex:      1,
-            enableKeyEvents: true,
-            listeners: {
-                keydown: {
-                    fn: function (field, e) {
-                        if (e.getKey() === e.ENTER && !e.shiftKey) {
-                            e.stopEvent();
-                            this.fireEvent('send', this);
-                        }
-                    },
-                    scope: this
-                }
-            }
-        });
-
-        this.sendBtn = new Ext.Button({
-            text:    'Send',
-            cls:     'fl-send-btn',
-            handler: function () { this.fireEvent('send', this); },
-            scope:   this
-        });
-
         Ext.apply(this, {
             cls:    'fl-input-area',
             border: false,
-            layout: 'form',
-            items: [
-                {
-                    xtype:  'panel',
-                    border: false,
-                    layout: 'hbox',
-                    items:  [
-                        this.reasoningCb,
-                        { xtype: 'tbtext', text: '&nbsp;&nbsp;Enables deeper analysis \u2014 may take a few seconds longer', cls: 'fl-opt-hint' }
-                    ]
-                },
-                {
-                    xtype:  'panel',
-                    border: false,
-                    layout: 'hbox',
-                    items:  [this.chatInput, { xtype: 'spacer', width: 10 }, this.sendBtn]
-                },
-                {
-                    xtype:  'panel',
-                    border: false,
-                    cls:    'fl-disclaimer',
-                    html:   'FusionLive AI can make mistakes. Always verify results against source documents.'
-                }
-            ]
+            html: [
+                '<div class="fl-input-options">',
+                '  <label class="fl-opt-label"><input type="checkbox" id="fl-reasoning-cb" checked> Reasoning</label>',
+                '  <span class="fl-opt-hint">Enables deeper analysis &mdash; may take a few seconds longer</span>',
+                '</div>',
+                '<div class="fl-input-box">',
+                '  <table class="fl-input-table"><tr>',
+                '    <td class="fl-input-td">',
+                '      <textarea id="fl-chat-textarea" rows="1" placeholder="Ask a question about your documents, transmittals, or metadata\u2026"></textarea>',
+                '    </td>',
+                '    <td class="fl-btn-td">',
+                '      <div id="fl-send-btn" role="button" tabindex="0" title="Send"' +
+                '           style="display:inline-block;width:34px;height:34px;background:#002060;border-radius:8px;cursor:pointer;vertical-align:middle;text-align:center;line-height:30px">' ,
+                '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" style="vertical-align:middle">',
+                '          <line x1="22" y1="2" x2="11" y2="13"/>',
+                '          <polygon points="22 2 15 22 11 13 2 9 22 2" fill="#fff"/>',
+                '        </svg>',
+                '      </div>',
+                '    </td>',
+                '  </tr></table>',
+                '</div>',
+                '<div class="fl-disclaimer">FusionLive AI can make mistakes. Always verify results against source documents.</div>'
+            ].join('')
         });
-
         this.addEvents('send');
         FusionLive.InputPanel.superclass.initComponent.call(this);
     },
 
-    getText:      function () { return this.chatInput.getValue(); },
-    clear:        function () { this.chatInput.setValue(''); },
-    useReasoning: function () { return this.reasoningCb.getValue(); }
+    afterRender: function () {
+        FusionLive.InputPanel.superclass.afterRender.call(this);
+        // Ensure Ext JS panel body doesn't clip the absolutely-positioned send button
+        this.body.setStyle('overflow', 'visible');
+        var me       = this;
+        this.textarea = document.getElementById('fl-chat-textarea');
+        this.sendBtnEl = document.getElementById('fl-send-btn');
+        this.reasoningEl = document.getElementById('fl-reasoning-cb');
+
+        // Auto-grow textarea
+        Ext.fly(this.textarea).on('input', function () {
+            me.textarea.style.height = 'auto';
+            me.textarea.style.height = Math.min(me.textarea.scrollHeight, 160) + 'px';
+        });
+
+        // Enter to send, Shift+Enter for newline
+        Ext.fly(this.textarea).on('keydown', function (e) {
+            if (e.getKey() === e.ENTER && !e.shiftKey) {
+                e.stopEvent();
+                me.fireEvent('send', me);
+            }
+        });
+
+        Ext.fly(this.sendBtnEl).on('click', function () {
+            me.fireEvent('send', me);
+        });
+        Ext.fly(this.sendBtnEl).on('keydown', function (e) {
+            if (e.getKey() === e.ENTER || e.getKey() === e.SPACE) {
+                e.stopEvent();
+                me.fireEvent('send', me);
+            }
+        });
+        // hover effect
+        Ext.fly(this.sendBtnEl).on('mouseover', function () { this.setStyle('background', '#003399'); }, Ext.fly(this.sendBtnEl));
+        Ext.fly(this.sendBtnEl).on('mouseout',  function () { this.setStyle('background', '#002060'); }, Ext.fly(this.sendBtnEl));
+    },
+
+    getText:      function () { return this.textarea ? this.textarea.value : ''; },
+    clear:        function () {
+        if (this.textarea) {
+            this.textarea.value = '';
+            this.textarea.style.height = 'auto';
+            this.textarea.focus();
+        }
+    },
+    useReasoning: function () { return this.reasoningEl ? this.reasoningEl.checked : true; }
 });
 Ext.reg('fl-inputpanel', FusionLive.InputPanel);
 
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Main ChatPanel
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// RightPanel: wraps messages (center) + input (south) so the splitter
+// only divides the history sidebar from the full chat column.
+FusionLive.RightPanel = Ext.extend(Ext.Panel, {
+
+    layout: 'fit',
+    border: false,
+
+    initComponent: function () {
+        this.messagesPanel = new FusionLive.MessagesPanel({});
+
+        Ext.apply(this, { items: [this.messagesPanel] });
+        FusionLive.RightPanel.superclass.initComponent.call(this);
+    },
+
+    afterRender: function () {
+        FusionLive.RightPanel.superclass.afterRender.call(this);
+        this.body.setStyle('position', 'relative');
+        var inputEl = document.getElementById('fl-input-area');
+        if (inputEl && inputEl.parentNode !== this.body.dom) {
+            this.body.dom.appendChild(inputEl);
+        }
+    },
+
+    appendUserMessage: function (text) { this.messagesPanel.appendUserMessage(text); },
+    appendThinking:    function (r)    { this.messagesPanel.appendThinking(r); },
+    reset:             function ()     { this.messagesPanel.reset(); }
+});
+Ext.reg('fl-rightpanel', FusionLive.RightPanel);
+
+
+// ChatPanel: history west (draggable splitter) + right panel center
 FusionLive.ChatPanel = Ext.extend(Ext.Panel, {
 
     layout: 'border',
@@ -513,41 +551,28 @@ FusionLive.ChatPanel = Ext.extend(Ext.Panel, {
     cls:    'fl-chat-panel',
 
     initComponent: function () {
-
-        this.historyPanel  = new FusionLive.HistoryPanel({ region: 'west', split: true, collapsible: true, collapseMode: 'mini' });
-        this.messagesPanel = new FusionLive.MessagesPanel({ region: 'center' });
-        this.inputPanel    = new FusionLive.InputPanel({ region: 'south', height: 'auto' });
-
-        Ext.apply(this, {
-            items: [this.historyPanel, this.messagesPanel, this.inputPanel]
+        this.historyPanel = new FusionLive.HistoryPanel({
+            region:   'west',
+            width:     230,
+            minWidth:  160,
+            maxWidth:  420,
+            split:     true
         });
+        this.rightPanel = new FusionLive.RightPanel({ region: 'center' });
 
+        Ext.apply(this, { items: [this.historyPanel, this.rightPanel] });
         FusionLive.ChatPanel.superclass.initComponent.call(this);
-
-        this.historyPanel.on('newchat', this.onNewChat,  this);
-        this.inputPanel.on('send',      this.onSend,     this);
-    },
-
-    onSend: function () {
-        var text = this.inputPanel.getText().trim();
-        if (!text) { return; }
-        this.messagesPanel.appendUserMessage(text);
-        this.inputPanel.clear();
-        var useReasoning = this.inputPanel.useReasoning();
-        var me = this;
-        (function () { me.messagesPanel.appendThinking(useReasoning); }).defer(400);
+        this.historyPanel.on('newchat', this.onNewChat, this);
     },
 
     onNewChat: function () {
-        this.messagesPanel.reset();
+        this.rightPanel.reset();
     }
 });
 Ext.reg('fl-chatpanel', FusionLive.ChatPanel);
 
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Bootstrap â€“ auto-render into #fl-chat-container on DOM ready
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Bootstrap
 Ext.onReady(function () {
 
     Ext.select('.nav-tab').on('click', function (e, t) {
@@ -556,16 +581,44 @@ Ext.onReady(function () {
         Ext.fly(t).addClass('active');
     });
 
-    // Only auto-render if the host page provides this container.
-    // In the legacy app, just use:  new FusionLive.ChatPanel({ renderTo: yourContainerId, ... })
     if (Ext.get('fl-chat-container')) {
+        var ct   = Ext.get('fl-chat-container');
         var chat = new FusionLive.ChatPanel({
-            renderTo: 'fl-chat-container',
-            height:   Ext.getBody().getViewSize().height - 160
+            renderTo: ct,
+            width:    ct.getWidth(),
+            height:   ct.getHeight()
         });
-        Ext.EventManager.onWindowResize(function (w, h) {
-            chat.setHeight(h - 160);
+        Ext.EventManager.onWindowResize(function () {
+            chat.setSize(ct.getWidth(), ct.getHeight());
         });
+
+        // ── Plain-JS input wiring (outside Ext JS panel system) ──────────
+        var textarea  = document.getElementById('fl-chat-textarea');
+        var sendBtn   = document.getElementById('fl-send-btn');
+        var reasonCb  = document.getElementById('fl-reasoning-cb');
+
+        function sendMessage() {
+            var text = textarea.value.trim();
+            if (!text) { return; }
+            chat.rightPanel.appendUserMessage(text);
+            textarea.value = '';
+            textarea.style.height = 'auto';
+            textarea.focus();
+            var useReasoning = reasonCb ? reasonCb.checked : true;
+            setTimeout(function () { chat.rightPanel.appendThinking(useReasoning); }, 400);
+        }
+
+        textarea.addEventListener('input', function () {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
+        });
+        textarea.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        sendBtn.addEventListener('click', sendMessage);
     }
 });
 

@@ -86,6 +86,24 @@
 -->
 <div id="fl-chat-container"></div>
 
+<!-- Input area – rendered outside Ext JS so no framework CSS resets interfere -->
+<div id="fl-input-area">
+  <div class="fl-input-options">
+    <label class="fl-opt-label"><input type="checkbox" id="fl-reasoning-cb" checked> Reasoning</label>
+    <span class="fl-opt-hint">Enables deeper analysis &mdash; may take a few seconds longer</span>
+  </div>
+  <div class="fl-input-box">
+    <textarea id="fl-chat-textarea" rows="1" placeholder="Ask a question about your documents, transmittals, or metadata&hellip;"></textarea>
+    <button id="fl-send-btn" type="button" title="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2" fill="#fff"/>
+      </svg>
+    </button>
+  </div>
+  <div class="fl-disclaimer">FusionLive AI can make mistakes. Always verify results against source documents.</div>
+</div>
+
 <!-- Ext JS 3.4.1 runtime -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/3.4.1-1/adapter/ext/ext-base.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/3.4.1-1/ext-all.js"></script>
