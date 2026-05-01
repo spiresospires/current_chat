@@ -70,6 +70,8 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-hist-menu .x-menu-list { background: transparent !important; padding: 0 !important; border: none !important; }
 .fl-hist-menu .x-menu-list-item { background: transparent !important; border: none !important; }
 .fl-hist-menu .x-menu-item,
+.fl-hist-menu .x-menu-item:link,
+.fl-hist-menu .x-menu-item:visited,
 .fl-hist-menu .x-menu-item:hover,
 .fl-hist-menu .x-menu-item:focus,
 .fl-hist-menu .x-menu-item:active,
@@ -90,17 +92,24 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
     text-shadow: none !important;
     transform: none !important;
     outline: none !important;
+    background: transparent !important;
+    color: #333 !important;
+    cursor: pointer !important;
 }
-.fl-hist-menu .x-menu-item { color: #333 !important; background: transparent !important; }
-.fl-hist-menu .x-menu-item:hover,
-.fl-hist-menu .x-menu-item-active { background: #eef2ff !important; color: #002060 !important; }
 .fl-hist-menu .x-menu-item-icon,
 .fl-hist-menu .x-menu-item-arrow { display: none !important; }
-.fl-hist-menu .x-menu-item-text { padding: 0 !important; margin: 0 !important; font-weight: 400 !important; text-decoration: none !important; }
+.fl-hist-menu .x-menu-item-text,
+.fl-hist-menu .x-menu-item:hover .x-menu-item-text,
+.fl-hist-menu .x-menu-item-active .x-menu-item-text { padding: 0 !important; margin: 0 !important; font-weight: 400 !important; text-decoration: none !important; color: inherit !important; }
+.fl-hist-menu a.fl-menu-danger,
+.fl-hist-menu a.fl-menu-danger:link,
+.fl-hist-menu a.fl-menu-danger:visited,
+.fl-hist-menu a.fl-menu-danger:hover,
+.fl-hist-menu a.fl-menu-danger:focus,
+.fl-hist-menu a.fl-menu-danger:active,
+.fl-hist-menu a.fl-menu-danger.x-menu-item-active { color: #c62828 !important; }
 .fl-hist-menu .x-menu-sep-li { padding: 4px 0 !important; }
 .fl-hist-menu .x-menu-sep { display: block !important; height: 1px !important; background: #eef0f6 !important; margin: 0 6px !important; border: none !important; }
-.fl-hist-menu .fl-menu-danger { color: #c62828 !important; }
-.fl-hist-menu .fl-menu-danger:hover { background: #fdecec !important; color: #c62828 !important; }
 
 /* ── Right panel: grey chat container background ─────────────── */
 .fl-right-panel, .fl-right-panel .x-panel-body, .fl-right-panel .x-panel-bwrap { background: #f8f9fb; }
