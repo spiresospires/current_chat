@@ -577,24 +577,384 @@ FusionLive.ChatPanel = Ext.extend(Ext.Panel, {
 Ext.reg('fl-chatpanel', FusionLive.ChatPanel);
 
 
+// ───────────────────────────────────────────────────────────────────────────
+// Administration view
+// ───────────────────────────────────────────────────────────────────────────
+
+// Left side menu — accordion of admin sections, with icon-tile sub-items
+FusionLive.AdminSideMenu = Ext.extend(Ext.Panel, {
+    region:    'west',
+    width:     230,
+    border:    false,
+    cls:       'fl-admin-side',
+    bodyStyle: 'background:#fff;',
+    autoScroll: true,
+
+    initComponent: function () {
+        var sections = [
+            { title: 'My Profile',           items: [] },
+            { title: 'Company Information', expanded: true, items: [
+                { id: 'details',     label: 'Details &amp; Location',  icon: '\u29C8' },
+                { id: 'users',       label: 'Company Users',           icon: '\u29C7' },
+                { id: 'workspaces',  label: 'Company Workspaces',      icon: '\u29C9' },
+                { id: 'pwd',         label: 'Password Policy',         icon: '\u29C5' },
+                { id: 'heatmap',     label: 'Heat Map Viewers',        icon: '\u29C4' },
+                { id: 'transmittal', label: 'Edit Transmittal Layout', icon: '\u29C6' },
+                { id: 'values',      label: 'Manage Values',           icon: '\u2630' },
+                { id: 'logo',        label: 'Manage Logo',             icon: '\u29C9' },
+                { id: 'sso',         label: 'SSO Settings',            icon: '\u26BF' },
+                { id: 'aiindex',     label: 'AI Indexing',             icon: '\u26A1', active: true }
+            ] },
+            { title: 'Workspace Homepage',   items: [] },
+            { title: 'Workspace Settings',   items: [] },
+            { title: 'Project Settings',     items: [] },
+            { title: 'User',                 items: [] },
+            { title: 'Self Administration',  items: [] },
+            { title: 'Rendition',            items: [] }
+        ];
+
+        var html = ['<div class="fl-admin-side-inner">'];
+        Ext.each(sections, function (sec) {
+            html.push('<div class="fl-admin-sec' + (sec.expanded ? ' fl-open' : '') + '">');
+            html.push('  <div class="fl-admin-sec-hd">');
+            html.push('    <span class="fl-admin-sec-title">' + sec.title + '</span>');
+            html.push('    <span class="fl-admin-sec-caret">' + (sec.expanded ? '\u25B2' : '\u25BC') + '</span>');
+            html.push('  </div>');
+            if (sec.items && sec.items.length) {
+                html.push('  <div class="fl-admin-sec-body">');
+                html.push('    <div class="fl-admin-tiles">');
+                Ext.each(sec.items, function (it) {
+                    html.push(
+                        '<div class="fl-admin-tile' + (it.active ? ' fl-active' : '') + '" data-tile="' + it.id + '">' +
+                            '<div class="fl-admin-tile-ic">' + it.icon + '</div>' +
+                            '<div class="fl-admin-tile-lb">' + it.label + '</div>' +
+                        '</div>'
+                    );
+                });
+                html.push('    </div>');
+                html.push('  </div>');
+            }
+            html.push('</div>');
+        });
+        html.push('</div>');
+
+        Ext.apply(this, { html: html.join('') });
+        FusionLive.AdminSideMenu.superclass.initComponent.call(this);
+    },
+
+    afterRender: function () {
+        FusionLive.AdminSideMenu.superclass.afterRender.call(this);
+        var me = this;
+        // Toggle section open/closed
+        this.body.on('click', function (e, t) {
+            var hd = e.getTarget('.fl-admin-sec-hd', 5);
+            if (hd) {
+                var sec = Ext.fly(hd).parent('.fl-admin-sec');
+                sec.toggleClass('fl-open');
+                var caret = Ext.fly(hd).child('.fl-admin-sec-caret');
+                if (caret) { caret.dom.innerHTML = sec.hasClass('fl-open') ? '\u25B2' : '\u25BC'; }
+                return;
+            }
+            var tile = e.getTarget('.fl-admin-tile', 5);
+            if (tile) {
+                var tiles = me.body.select('.fl-admin-tile');
+                tiles.removeClass('fl-active');
+                Ext.fly(tile).addClass('fl-active');
+                me.fireEvent('tileclick', tile.getAttribute('data-tile'));
+            }
+        });
+    }
+});
+Ext.reg('fl-adminsidemenu', FusionLive.AdminSideMenu);
+
+
+// AI Indexing Configuration grid
+FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
+    region: 'center',
+    border: false,
+    layout: 'fit',
+    cls:    'fl-ai-index',
+    bodyStyle: 'background:#fff;padding:0;',
+
+    initComponent: function () {
+        var me = this;
+
+        var data = [
+            [1,  'London Bridge Infrastructure - Phase 2',     'Owner', true,  100, 'done'],
+            [2,  'Hinkley Point C - Structural Documentation', 'Owner', true,  85,  'progress'],
+            [3,  'Doha Metro Gold Line Integration',           'Owner', true,  45,  'progress'],
+            [4,  'Offshore Wind Farm - Maintenance Manuals',   'Owner', true,  98,  'progress'],
+            [5,  'Crossrail 2 Preliminary Design',             'Owner', true,  100, 'done'],
+            [6,  'Tideway Tunnel Asset Management',            'Owner', true,  12,  'progress'],
+            [7,  'HS2 North Link Engineering',                 'Owner', false, 0,   'excluded'],
+            [8,  'Dubai Creek Tower Concept Stage',            'Owner', true,  67,  'progress'],
+            [9,  'Forth Road Bridge Retrofit',                 'Owner', true,  100, 'done'],
+            [10, 'Northern Line Extension - O&amp;M Manuals',  'Owner', false, 0,   'excluded'],
+            [11, 'Sellafield Site Decommissioning Docs',       'Owner', true,  34,  'progress'],
+            [12, 'Heathrow Terminal 6 Concept',                'Owner', true,  72,  'progress'],
+            [13, 'Aberdeen Harbour Expansion',                 'Owner', true,  91,  'progress'],
+            [14, 'M25 Junction Upgrade Programme',             'Owner', true,  100, 'done'],
+            [15, 'Trans-Pennine Tunnel Studies',               'Owner', false, 0,   'excluded'],
+            [16, 'Bristol Tidal Lagoon Feasibility',           'Owner', true,  58,  'progress'],
+            [17, 'Edinburgh Tram Network Phase 3',             'Owner', true,  23,  'progress'],
+            [18, 'Manchester Airport City Masterplan',         'Owner', true,  100, 'done'],
+            [19, 'Cardiff Bay Barrage Maintenance',            'Owner', true,  77,  'progress'],
+            [20, 'Belfast Harbour Smart Port',                 'Owner', true,  41,  'progress']
+        ];
+
+        var store = new Ext.data.ArrayStore({
+            fields: ['rank','name','membership','indexed','progress','progressState'],
+            data: data
+        });
+        this.store = store;
+
+        var sm = new Ext.grid.CheckboxSelectionModel({ singleSelect: false });
+
+        var rankRenderer = function (v, m, rec) {
+            var dim = !rec.get('indexed');
+            return '<span class="fl-rank' + (dim ? ' fl-dim' : '') + '">' + v + '</span>';
+        };
+        var nameRenderer = function (v, m, rec) {
+            var dot = rec.get('indexed') ? 'fl-dot-on' : 'fl-dot-off';
+            return '<span class="fl-dot ' + dot + '"></span>' + v;
+        };
+        var membershipRenderer = function (v) {
+            return '<span class="fl-membership">' + v + '</span>';
+        };
+        var toggleRenderer = function (v, m, rec) {
+            return '<div class="fl-toggle ' + (v ? 'fl-on' : 'fl-off') + '" data-rowid="' + rec.id + '"><span class="fl-toggle-knob"></span></div>';
+        };
+        var progressRenderer = function (v, m, rec) {
+            var state = rec.get('progressState');
+            if (state === 'excluded') {
+                return '<div class="fl-prog-excluded"><span class="fl-prog-info">\u24D8</span> Excluded from Index</div>';
+            }
+            var cls = (state === 'done') ? 'fl-prog-done' : 'fl-prog-active';
+            var icon = (state === 'done')
+                ? '<span class="fl-prog-check">\u2714</span>'
+                : '<span class="fl-prog-clock">\u25F7</span>';
+            return '' +
+                '<div class="fl-prog-wrap">' +
+                  '<div class="fl-prog-bar"><div class="fl-prog-fill ' + cls + '" style="width:' + v + '%"></div></div>' +
+                  '<span class="fl-prog-pct">' + v + '%</span>' +
+                  icon +
+                '</div>';
+        };
+
+        var cm = new Ext.grid.ColumnModel({
+            defaults: { sortable: false, menuDisabled: true },
+            columns: [
+                sm,
+                { header: 'RANK',              dataIndex: 'rank',       width: 70,  align: 'center', renderer: rankRenderer },
+                { id: 'col-ws',
+                  header: 'WORKSPACE NAME',    dataIndex: 'name',       width: 380, renderer: nameRenderer },
+                { header: 'MEMBERSHIP',        dataIndex: 'membership', width: 130, align: 'center', renderer: membershipRenderer },
+                { header: 'INDEX FOR AI CHAT', dataIndex: 'indexed',    width: 150, align: 'center', renderer: toggleRenderer },
+                { header: 'INDEXING PROGRESS', dataIndex: 'progress',   width: 240, renderer: progressRenderer }
+            ]
+        });
+
+        var grid = new Ext.grid.GridPanel({
+            store:            store,
+            cm:               cm,
+            sm:               sm,
+            border:           false,
+            stripeRows:       false,
+            autoExpandColumn: 'col-ws',
+            cls:              'fl-ai-grid',
+            viewConfig:       { forceFit: false }
+        });
+        this.grid = grid;
+
+        // Top toolbar — title + priority controls
+        var topbar = new Ext.Toolbar({
+            cls: 'fl-ai-topbar',
+            items: [
+                { xtype: 'tbtext', text: '<div class="fl-ai-title-wrap">' +
+                    '<div class="fl-ai-title">MANAGE AI PROCESSING PRIORITY</div>' +
+                    '<div class="fl-ai-sub"><i>Displaying workspaces with \'Owner\' privileges. Adjust indexing order using controls.</i></div>' +
+                  '</div>' },
+                '->',
+                { xtype: 'tbtext', text: '<div class="fl-prio-card">' +
+                    '<div class="fl-prio-label">PRIORITY CONTROLS:</div>' +
+                    '<div class="fl-prio-btns">' +
+                      '<button class="fl-prio-btn" data-prio="up" title="Move up">\u25B2</button>' +
+                      '<button class="fl-prio-btn" data-prio="down" title="Move down">\u25BC</button>' +
+                      '<button class="fl-prio-btn fl-prio-refresh" data-prio="refresh" title="Refresh">\u21BB</button>' +
+                    '</div>' +
+                  '</div>' }
+            ]
+        });
+
+        // Bottom bar — pagination text
+        var bottombar = new Ext.Toolbar({
+            cls: 'fl-ai-bottombar',
+            items: [
+                { xtype: 'tbtext', text: '<span class="fl-page-lbl">PAGE <b>1</b> OF 1</span> &nbsp; <a class="fl-csv-link" href="#">Download Priority Report (.csv)</a>' },
+                '->',
+                { xtype: 'tbtext', text: '<i>Displaying all 20 workspaces where you are Owner</i>' }
+            ]
+        });
+
+        // Header strip (the dark blue "AI Indexing Configuration" bar)
+        var header = new Ext.Panel({
+            border: false,
+            height: 42,
+            cls:    'fl-ai-header',
+            html:   '<div class="fl-ai-header-inner"><span class="fl-ai-header-icon">\u2699</span>AI Indexing Configuration</div>'
+        });
+
+        // Main container: header (north) + content (center)
+        var content = new Ext.Panel({
+            border: false,
+            layout: 'fit',
+            cls:    'fl-ai-content',
+            tbar:   topbar,
+            bbar:   bottombar,
+            items:  [grid]
+        });
+
+        Ext.apply(this, {
+            layout: 'border',
+            items: [
+                Ext.apply(header, { region: 'north' }),
+                Ext.apply(content, { region: 'center' })
+            ]
+        });
+
+        FusionLive.AiIndexingPanel.superclass.initComponent.call(this);
+    },
+
+    afterRender: function () {
+        FusionLive.AiIndexingPanel.superclass.afterRender.call(this);
+        var me = this;
+
+        // Toggle index on/off
+        this.body.on('click', function (e, t) {
+            var tog = e.getTarget('.fl-toggle');
+            if (tog) {
+                e.stopEvent();
+                var rec = me.grid.getStore().getAt(me.grid.getView().findRowIndex(tog));
+                if (!rec) { return; }
+                var nowOn = !rec.get('indexed');
+                rec.set('indexed', nowOn);
+                if (nowOn) {
+                    if (rec.get('progressState') === 'excluded') {
+                        rec.set('progress', 0);
+                        rec.set('progressState', 'progress');
+                    }
+                } else {
+                    rec.set('progress', 0);
+                    rec.set('progressState', 'excluded');
+                }
+                rec.commit();
+                return;
+            }
+            var prio = e.getTarget('.fl-prio-btn');
+            if (prio) {
+                e.stopEvent();
+                var act = prio.getAttribute('data-prio');
+                if (act === 'up' || act === 'down') { me.moveSelected(act); }
+                else if (act === 'refresh')         { me.refreshRanks(); }
+            }
+        });
+    },
+
+    moveSelected: function (dir) {
+        var sm    = this.grid.getSelectionModel();
+        var store = this.grid.getStore();
+        var recs  = sm.getSelections();
+        if (!recs.length) { return; }
+        // Sort by current index ascending; for "down" iterate in reverse.
+        recs.sort(function (a, b) { return store.indexOf(a) - store.indexOf(b); });
+        if (dir === 'down') { recs.reverse(); }
+        Ext.each(recs, function (rec) {
+            var i  = store.indexOf(rec);
+            var ni = (dir === 'up') ? i - 1 : i + 1;
+            if (ni < 0 || ni >= store.getCount()) { return; }
+            store.remove(rec);
+            store.insert(ni, rec);
+        });
+        this.refreshRanks();
+        sm.selectRecords(recs);
+    },
+
+    refreshRanks: function () {
+        var store = this.grid.getStore();
+        store.each(function (rec, i) { rec.set('rank', i + 1); rec.commit(); });
+    }
+});
+Ext.reg('fl-aiindexpanel', FusionLive.AiIndexingPanel);
+
+
+// AdminPanel: side menu west + content center
+FusionLive.AdminPanel = Ext.extend(Ext.Panel, {
+    layout: 'border',
+    border: false,
+    cls:    'fl-admin-panel',
+
+    initComponent: function () {
+        this.sideMenu  = new FusionLive.AdminSideMenu({ split: true });
+        this.aiPanel   = new FusionLive.AiIndexingPanel();
+        Ext.apply(this, { items: [this.sideMenu, this.aiPanel] });
+        FusionLive.AdminPanel.superclass.initComponent.call(this);
+    }
+});
+Ext.reg('fl-adminpanel', FusionLive.AdminPanel);
+
+
 // Bootstrap
 Ext.onReady(function () {
+
+    var chatCt  = Ext.get('fl-chat-container');
+    var adminCt = Ext.get('fl-admin-container');
+    var inputEl = Ext.get('fl-input-area');
+    var chat, admin;
+
+    function showChat() {
+        if (adminCt) { adminCt.setStyle('display', 'none'); }
+        if (chatCt)  { chatCt.setStyle('display', 'block'); }
+        if (chat) { chat.setSize(chatCt.getWidth(), chatCt.getHeight()); }
+    }
+    function showAdmin() {
+        if (chatCt)  { chatCt.setStyle('display',  'none'); }
+        if (adminCt) { adminCt.setStyle('display', 'block'); }
+        // Park the input area inside the chat container so it isn't visible in admin
+        if (inputEl && chatCt && inputEl.dom.parentNode !== chatCt.dom) {
+            chatCt.dom.appendChild(inputEl.dom);
+        }
+        if (!admin && adminCt) {
+            admin = new FusionLive.AdminPanel({
+                renderTo: adminCt,
+                width:    adminCt.getWidth(),
+                height:   adminCt.getHeight()
+            });
+            Ext.EventManager.onWindowResize(function () {
+                if (adminCt.isVisible()) { admin.setSize(adminCt.getWidth(), adminCt.getHeight()); }
+            });
+        } else if (admin) {
+            admin.setSize(adminCt.getWidth(), adminCt.getHeight());
+        }
+    }
 
     Ext.select('.nav-tab').on('click', function (e, t) {
         e.preventDefault();
         Ext.select('.nav-tab').removeClass('active');
         Ext.fly(t).addClass('active');
+        var label = (t.textContent || t.innerText || '').replace(/^\s+|\s+$/g, '');
+        if (label === 'Administration') { showAdmin(); }
+        else if (label === 'Chat')      { showChat();  }
+        else                            { showChat();  }
     });
 
-    if (Ext.get('fl-chat-container')) {
-        var ct   = Ext.get('fl-chat-container');
-        var chat = new FusionLive.ChatPanel({
-            renderTo: ct,
-            width:    ct.getWidth(),
-            height:   ct.getHeight()
+    if (chatCt) {
+        chat = new FusionLive.ChatPanel({
+            renderTo: chatCt,
+            width:    chatCt.getWidth(),
+            height:   chatCt.getHeight()
         });
         Ext.EventManager.onWindowResize(function () {
-            chat.setSize(ct.getWidth(), ct.getHeight());
+            if (chatCt.isVisible()) { chat.setSize(chatCt.getWidth(), chatCt.getHeight()); }
         });
 
         // ── Plain-JS input wiring (outside Ext JS panel system) ──────────
@@ -626,4 +986,5 @@ Ext.onReady(function () {
         sendBtn.addEventListener('click', sendMessage);
     }
 });
+
 

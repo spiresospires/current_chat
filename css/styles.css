@@ -209,3 +209,187 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 #fl-send-btn svg { pointer-events: none; display: block; }
 
 .fl-disclaimer { font-size: 10px; color: #ccc; text-align: center; margin-top: 6px; }
+
+/* ═══════════════════════════════════════════════════════
+   Administration view
+═══════════════════════════════════════════════════════ */
+
+/* Admin container fills same area as chat container */
+#fl-admin-container {
+    position: absolute;
+    top: 115px; left: 0; right: 0; bottom: 0;
+    background: #fff;
+}
+
+.fl-admin-panel, .fl-admin-panel .x-border-layout-ct { background: #fff !important; }
+
+/* ── Side menu ───────────────────────────────────────── */
+.fl-admin-side, .fl-admin-side .x-panel-body { background: #fff; }
+.fl-admin-side-inner { padding: 8px 0; }
+
+.fl-admin-sec { border-bottom: 1px solid #eef0f4; }
+.fl-admin-sec-hd {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 14px; cursor: pointer;
+    color: #1a237e; font-weight: bold; font-size: 13px;
+}
+.fl-admin-sec-hd:hover { background: #f6f8fc; }
+.fl-admin-sec-caret { color: #5a6480; font-size: 10px; }
+.fl-admin-sec-body  { display: none; padding: 4px 8px 12px; }
+.fl-admin-sec.fl-open .fl-admin-sec-body { display: block; }
+
+.fl-admin-tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+.fl-admin-tile {
+    text-align: center;
+    padding: 10px 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #4a5570;
+}
+.fl-admin-tile:hover { background: #f0f3fa; color: #1a237e; }
+.fl-admin-tile.fl-active { background: #e8ecf7; color: #1a237e; }
+.fl-admin-tile.fl-active .fl-admin-tile-lb { font-weight: bold; }
+.fl-admin-tile-ic {
+    font-size: 22px; line-height: 1; margin-bottom: 4px; color: #6b7596;
+}
+.fl-admin-tile.fl-active .fl-admin-tile-ic { color: #1a237e; }
+.fl-admin-tile-lb { font-size: 11px; line-height: 1.25; }
+
+/* Splitter between side menu and content */
+.fl-admin-panel .x-layout-split-west {
+    width: 4px !important; background: #e0e3eb !important; border: none !important;
+}
+
+/* ── AI Indexing content ─────────────────────────────── */
+.fl-ai-index, .fl-ai-index .x-panel-body { background: #fff; }
+.fl-ai-content, .fl-ai-content .x-panel-body { background: #fff; }
+
+/* Header strip */
+.fl-ai-header, .fl-ai-header .x-panel-body {
+    background: #4a5cd0 !important;
+    color: #fff;
+    border: none;
+}
+.fl-ai-header-inner {
+    display: flex; align-items: center; height: 42px;
+    padding: 0 18px; font-size: 14px; font-weight: bold; letter-spacing: .3px;
+}
+.fl-ai-header-icon { margin-right: 8px; font-size: 16px; }
+
+/* Top toolbar (title + priority controls) */
+.fl-ai-topbar.x-toolbar, .fl-ai-topbar .x-toolbar-ct {
+    background: #fff !important;
+    border: none !important;
+    border-bottom: 1px solid #eef0f4 !important;
+    padding: 14px 18px !important;
+    height: auto !important;
+}
+.fl-ai-topbar .xtb-text { line-height: 1.3; }
+.fl-ai-title-wrap .fl-ai-title {
+    font-size: 17px; font-weight: bold; color: #1a237e; letter-spacing: .3px;
+}
+.fl-ai-title-wrap .fl-ai-sub {
+    font-size: 12px; color: #6b7596; margin-top: 2px;
+}
+
+.fl-prio-card {
+    display: inline-flex; align-items: center; gap: 12px;
+    border: 1px solid #e0e3eb; border-radius: 4px;
+    padding: 8px 14px; background: #fafbfd;
+}
+.fl-prio-label { font-size: 11px; color: #6b7596; letter-spacing: .5px; font-weight: bold; }
+.fl-prio-btns { display: inline-flex; gap: 6px; }
+.fl-prio-btn {
+    width: 28px; height: 28px;
+    border: 1px solid #c8cee0; background: #fff; border-radius: 4px;
+    color: #4a5570; font-size: 12px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.fl-prio-btn:hover { background: #eef1f9; border-color: #1a237e; color: #1a237e; }
+.fl-prio-refresh { font-size: 16px; }
+
+/* Bottom toolbar */
+.fl-ai-bottombar.x-toolbar, .fl-ai-bottombar .x-toolbar-ct {
+    background: #fafbfd !important;
+    border: none !important;
+    border-top: 1px solid #eef0f4 !important;
+    padding: 8px 18px !important;
+}
+.fl-ai-bottombar .xtb-text { color: #6b7596; font-size: 12px; }
+.fl-page-lbl { color: #6b7596; }
+.fl-csv-link { color: #1565c0; text-decoration: none; margin-left: 8px; }
+.fl-csv-link:hover { text-decoration: underline; }
+
+/* ── Grid styling ────────────────────────────────────── */
+.fl-ai-grid .x-grid3-header {
+    background: #fafbfd !important;
+    border-bottom: 1px solid #e0e3eb;
+}
+.fl-ai-grid .x-grid3-hd-row td {
+    padding: 12px 8px !important;
+    background: #fafbfd !important;
+}
+.fl-ai-grid .x-grid3-hd-inner {
+    color: #6b7596 !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    letter-spacing: .5px !important;
+    text-transform: uppercase;
+}
+.fl-ai-grid .x-grid3-row { border-bottom: 1px solid #f0f2f7; }
+.fl-ai-grid .x-grid3-row td { padding: 14px 8px !important; }
+.fl-ai-grid .x-grid3-cell-inner { font-size: 13px; color: #2c3454; }
+
+/* Rank cell */
+.fl-rank { color: #1565c0; font-weight: bold; font-size: 14px; }
+.fl-rank.fl-dim { color: #b0b6c8; font-weight: normal; }
+
+/* Status dot before workspace name */
+.fl-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 10px; vertical-align: middle;
+}
+.fl-dot-on  { background: #2ea043; }
+.fl-dot-off { background: #c0c5d4; }
+
+/* Membership */
+.fl-membership { color: #6b7596; font-style: italic; }
+
+/* Toggle switch */
+.fl-toggle {
+    display: inline-block; position: relative;
+    width: 38px; height: 20px; border-radius: 12px;
+    background: #c8cee0; cursor: pointer; vertical-align: middle;
+    transition: background .15s;
+}
+.fl-toggle.fl-on  { background: #4a5cd0; }
+.fl-toggle.fl-off { background: #c8cee0; }
+.fl-toggle-knob {
+    position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    transition: left .15s;
+}
+.fl-toggle.fl-on .fl-toggle-knob { left: 20px; }
+
+/* Progress bar */
+.fl-prog-wrap { display: flex; align-items: center; gap: 8px; }
+.fl-prog-bar {
+    flex: 1; height: 8px; background: #eef0f4; border-radius: 4px; overflow: hidden;
+    min-width: 110px;
+}
+.fl-prog-fill { height: 100%; border-radius: 4px; }
+.fl-prog-fill.fl-prog-active { background: #4a5cd0; }
+.fl-prog-fill.fl-prog-done   { background: #2ea043; }
+.fl-prog-pct { font-size: 12px; color: #6b7596; min-width: 32px; text-align: right; }
+.fl-prog-check { color: #2ea043; font-size: 14px; }
+.fl-prog-clock { color: #b0b6c8; font-size: 13px; }
+.fl-prog-excluded { color: #b0b6c8; font-style: italic; font-size: 12px; }
+.fl-prog-info { font-style: normal; margin-right: 4px; }
+
+/* Selection model checkbox column tweaks */
+.fl-ai-grid .x-grid3-hd-checker, .fl-ai-grid .x-grid3-row-checker { background-color: transparent !important; }
