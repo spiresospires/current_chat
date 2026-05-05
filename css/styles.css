@@ -326,25 +326,46 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-csv-link { color: #1565c0; text-decoration: none; margin-left: 8px; }
 .fl-csv-link:hover { text-decoration: underline; }
 
-/* ── Grid styling ────────────────────────────────────── */
+/* ── Grid styling — matches the chat response doc-list card ── */
+.fl-ai-grid {
+    margin: 14px 18px 4px;
+    border: 1px solid #dde2ef !important;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
 .fl-ai-grid .x-grid3-header {
     background: #fafbfd !important;
-    border-bottom: 1px solid #e0e3eb;
+    border-bottom: 1px solid #dde2ef;
 }
 .fl-ai-grid .x-grid3-hd-row td {
-    padding: 12px 8px !important;
+    padding: 10px 8px !important;
     background: #fafbfd !important;
+    border-right: none !important;
 }
 .fl-ai-grid .x-grid3-hd-inner {
-    color: #6b7596 !important;
+    color: #666 !important;
     font-size: 11px !important;
     font-weight: bold !important;
-    letter-spacing: .5px !important;
+    letter-spacing: .4px !important;
     text-transform: uppercase;
 }
-.fl-ai-grid .x-grid3-row { border-bottom: 1px solid #f0f2f7; }
-.fl-ai-grid .x-grid3-row td { padding: 14px 8px !important; }
-.fl-ai-grid .x-grid3-cell-inner { font-size: 13px; color: #2c3454; }
+.fl-ai-grid .x-grid3-row {
+    border-bottom: 1px solid #eef0f6 !important;
+    background: #fff;
+}
+.fl-ai-grid .x-grid3-row-alt { background: #f7f8fc !important; }
+.fl-ai-grid .x-grid3-row-over,
+.fl-ai-grid .x-grid3-row-over.x-grid3-row-alt { background: #eef2ff !important; }
+.fl-ai-grid .x-grid3-row-selected,
+.fl-ai-grid .x-grid3-row-selected.x-grid3-row-alt { background: #e3ebff !important; }
+.fl-ai-grid .x-grid3-row:last-child { border-bottom: none !important; }
+.fl-ai-grid .x-grid3-row td {
+    padding: 10px 8px !important;
+    border-right: none !important;
+    border-left: none !important;
+}
+.fl-ai-grid .x-grid3-cell-inner { font-size: 12px; color: #2c3454; }
 
 /* Rank cell */
 .fl-rank { color: #1565c0; font-weight: bold; font-size: 14px; }

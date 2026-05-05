@@ -759,7 +759,7 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
             cm:               cm,
             sm:               sm,
             border:           false,
-            stripeRows:       false,
+            stripeRows:       true,
             autoExpandColumn: 'col-ws',
             cls:              'fl-ai-grid',
             viewConfig:       { forceFit: false }
