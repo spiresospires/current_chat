@@ -268,17 +268,19 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-ai-index, .fl-ai-index .x-panel-body { background: #fff; }
 .fl-ai-content, .fl-ai-content .x-panel-body { background: #fff; }
 
-/* Header strip */
+/* Header strip — clean white, matches rest of app chrome */
 .fl-ai-header, .fl-ai-header .x-panel-body {
-    background: #4a5cd0 !important;
-    color: #fff;
+    background: #fff !important;
+    color: #1a237e;
     border: none;
+    border-bottom: 1px solid #e0e3eb !important;
 }
 .fl-ai-header-inner {
     display: flex; align-items: center; height: 42px;
     padding: 0 18px; font-size: 14px; font-weight: bold; letter-spacing: .3px;
+    color: #1a237e;
 }
-.fl-ai-header-icon { margin-right: 8px; font-size: 16px; }
+.fl-ai-header-icon { margin-right: 8px; font-size: 16px; color: #1a237e; }
 
 /* Top toolbar (title + priority controls) */
 .fl-ai-topbar.x-toolbar, .fl-ai-topbar .x-toolbar-ct {
@@ -366,7 +368,7 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
     background: #c8cee0; cursor: pointer; vertical-align: middle;
     transition: background .15s;
 }
-.fl-toggle.fl-on  { background: #4a5cd0; }
+.fl-toggle.fl-on  { background: #1a237e; }
 .fl-toggle.fl-off { background: #c8cee0; }
 .fl-toggle-knob {
     position: absolute; top: 2px; left: 2px;
@@ -383,7 +385,7 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
     min-width: 110px;
 }
 .fl-prog-fill { height: 100%; border-radius: 4px; }
-.fl-prog-fill.fl-prog-active { background: #4a5cd0; }
+.fl-prog-fill.fl-prog-active { background: #1a237e; }
 .fl-prog-fill.fl-prog-done   { background: #2ea043; }
 .fl-prog-pct { font-size: 12px; color: #6b7596; min-width: 32px; text-align: right; }
 .fl-prog-check { color: #2ea043; font-size: 14px; }
