@@ -155,6 +155,44 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 
 /* ── Input area – ChatGPT style ────────────────────────────────── */
 .fl-input-area { background: #fff; border-top: 1px solid #dde2ef; padding: 12px 20px 10px; }
+
+/* Workspace indexing status pill — small, non-intrusive */
+.fl-index-status {
+    position: absolute;
+    top: -14px; right: 18px;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 4px 11px;
+    background: #fff;
+    border: 1px solid #dde2ef;
+    border-radius: 14px;
+    font-size: 11px;
+    color: #5a6480;
+    box-shadow: 0 1px 3px rgba(26, 35, 126, 0.06);
+    line-height: 1;
+    z-index: 6;
+    white-space: nowrap;
+}
+.fl-index-status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #1a237e;
+    box-shadow: 0 0 0 0 rgba(26, 35, 126, 0.5);
+    animation: fl-index-pulse 1.6s ease-out infinite;
+}
+@keyframes fl-index-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(26, 35, 126, 0.45); }
+    70%  { box-shadow: 0 0 0 6px rgba(26, 35, 126, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(26, 35, 126, 0); }
+}
+.fl-index-status-label { font-weight: bold; color: #1a237e; }
+.fl-index-status-count { color: #5a6480; }
+.fl-index-status-done  { font-weight: bold; color: #1a237e; }
+.fl-index-status-sep   { color: #b0b6c8; }
+.fl-index-status-total { color: #8a92a8; font-size: 10px; }
+.fl-index-status-ws    { color: #8a92a8; font-style: italic; }
+.fl-index-status.fl-done .fl-index-status-dot { background: #2ea043; animation: none; }
+.fl-index-status.fl-done .fl-index-status-label,
+.fl-index-status.fl-done .fl-index-status-done { color: #2e7d32; }
+
 .fl-input-options { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .fl-opt-label { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; cursor: pointer; user-select: none; }
 .fl-opt-label input[type=checkbox] { cursor: pointer; accent-color: #002060; }
@@ -399,20 +437,30 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 }
 .fl-toggle.fl-on .fl-toggle-knob { left: 20px; }
 
-/* Progress bar */
-.fl-prog-wrap { display: flex; align-items: center; gap: 8px; }
-.fl-prog-bar {
-    flex: 1; height: 8px; background: #eef0f4; border-radius: 4px; overflow: hidden;
-    min-width: 110px;
+/* Queue Status — text-based dynamic indicator */
+.fl-q-wrap {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px;
 }
-.fl-prog-fill { height: 100%; border-radius: 4px; }
-.fl-prog-fill.fl-prog-active { background: #1a237e; }
-.fl-prog-fill.fl-prog-done   { background: #2ea043; }
-.fl-prog-pct { font-size: 12px; color: #6b7596; min-width: 32px; text-align: right; }
-.fl-prog-check { color: #2ea043; font-size: 14px; }
-.fl-prog-clock { color: #b0b6c8; font-size: 13px; }
-.fl-prog-excluded { color: #b0b6c8; font-style: italic; font-size: 12px; }
-.fl-prog-info { font-style: normal; margin-right: 4px; }
+.fl-q-count { white-space: nowrap; }
+.fl-q-done-num { font-weight: bold; color: #1a237e; font-size: 14px; }
+.fl-q-sep      { color: #b0b6c8; }
+.fl-q-total    { color: #8a92a8; font-size: 12px; }
+
+.fl-q-label {
+    font-size: 11px; letter-spacing: .3px;
+    padding: 2px 7px; border-radius: 10px;
+    background: #eef0f4; color: #5a6480;
+}
+.fl-q-wrap.fl-q-active  .fl-q-label { background: #e8ecf7; color: #1a237e; }
+.fl-q-wrap.fl-q-done    .fl-q-label { background: #e6f4ea; color: #2e7d32; }
+.fl-q-wrap.fl-q-queued  .fl-q-label { background: #fff3e0; color: #b35c00; }
+.fl-q-wrap.fl-q-done .fl-q-done-num { color: #2e7d32; }
+
+.fl-q-tick  { color: #2ea043; font-size: 14px; }
+.fl-q-clock { color: #b0b6c8; font-size: 13px; }
+.fl-q-excluded { color: #b0b6c8; font-style: italic; font-size: 12px; }
+.fl-q-info     { font-style: normal; margin-right: 4px; }
 
 /* Selection model checkbox column tweaks */
 .fl-ai-grid .x-grid3-hd-checker, .fl-ai-grid .x-grid3-row-checker { background-color: transparent !important; }

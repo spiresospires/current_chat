@@ -679,31 +679,33 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
     initComponent: function () {
         var me = this;
 
+        // Mock data — processedCount / queueTotal model
+        // state: 'done' | 'progress' | 'queued' | 'excluded'
         var data = [
-            [1,  'London Bridge Infrastructure - Phase 2',     'Owner', true,  100, 'done'],
-            [2,  'Hinkley Point C - Structural Documentation', 'Owner', true,  85,  'progress'],
-            [3,  'Doha Metro Gold Line Integration',           'Owner', true,  45,  'progress'],
-            [4,  'Offshore Wind Farm - Maintenance Manuals',   'Owner', true,  98,  'progress'],
-            [5,  'Crossrail 2 Preliminary Design',             'Owner', true,  100, 'done'],
-            [6,  'Tideway Tunnel Asset Management',            'Owner', true,  12,  'progress'],
-            [7,  'HS2 North Link Engineering',                 'Owner', false, 0,   'excluded'],
-            [8,  'Dubai Creek Tower Concept Stage',            'Owner', true,  67,  'progress'],
-            [9,  'Forth Road Bridge Retrofit',                 'Owner', true,  100, 'done'],
-            [10, 'Northern Line Extension - O&amp;M Manuals',  'Owner', false, 0,   'excluded'],
-            [11, 'Sellafield Site Decommissioning Docs',       'Owner', true,  34,  'progress'],
-            [12, 'Heathrow Terminal 6 Concept',                'Owner', true,  72,  'progress'],
-            [13, 'Aberdeen Harbour Expansion',                 'Owner', true,  91,  'progress'],
-            [14, 'M25 Junction Upgrade Programme',             'Owner', true,  100, 'done'],
-            [15, 'Trans-Pennine Tunnel Studies',               'Owner', false, 0,   'excluded'],
-            [16, 'Bristol Tidal Lagoon Feasibility',           'Owner', true,  58,  'progress'],
-            [17, 'Edinburgh Tram Network Phase 3',             'Owner', true,  23,  'progress'],
-            [18, 'Manchester Airport City Masterplan',         'Owner', true,  100, 'done'],
-            [19, 'Cardiff Bay Barrage Maintenance',            'Owner', true,  77,  'progress'],
-            [20, 'Belfast Harbour Smart Port',                 'Owner', true,  41,  'progress']
+            [1,  'London Bridge Infrastructure - Phase 2',     'Owner', true,  2345, 2345, 'done'],
+            [2,  'Hinkley Point C - Structural Documentation', 'Owner', true,  1487, 1750, 'progress'],
+            [3,  'Doha Metro Gold Line Integration',           'Owner', true,  892,  1980, 'progress'],
+            [4,  'Offshore Wind Farm - Maintenance Manuals',   'Owner', true,  3421, 3490, 'progress'],
+            [5,  'Crossrail 2 Preliminary Design',             'Owner', true,  1205, 1205, 'done'],
+            [6,  'Tideway Tunnel Asset Management',            'Owner', true,  142,  1180, 'progress'],
+            [7,  'HS2 North Link Engineering',                 'Owner', false, 0,    0,    'excluded'],
+            [8,  'Dubai Creek Tower Concept Stage',            'Owner', true,  1567, 2340, 'progress'],
+            [9,  'Forth Road Bridge Retrofit',                 'Owner', true,  876,  876,  'done'],
+            [10, 'Northern Line Extension - O&amp;M Manuals',  'Owner', false, 0,    0,    'excluded'],
+            [11, 'Sellafield Site Decommissioning Docs',       'Owner', true,  0,    4120, 'queued'],
+            [12, 'Heathrow Terminal 6 Concept',                'Owner', true,  1432, 1990, 'progress'],
+            [13, 'Aberdeen Harbour Expansion',                 'Owner', true,  1721, 1890, 'progress'],
+            [14, 'M25 Junction Upgrade Programme',             'Owner', true,  654,  654,  'done'],
+            [15, 'Trans-Pennine Tunnel Studies',               'Owner', false, 0,    0,    'excluded'],
+            [16, 'Bristol Tidal Lagoon Feasibility',           'Owner', true,  0,    945,  'queued'],
+            [17, 'Edinburgh Tram Network Phase 3',             'Owner', true,  234,  1020, 'progress'],
+            [18, 'Manchester Airport City Masterplan',         'Owner', true,  2104, 2104, 'done'],
+            [19, 'Cardiff Bay Barrage Maintenance',            'Owner', true,  1156, 1500, 'progress'],
+            [20, 'Belfast Harbour Smart Port',                 'Owner', true,  490,  1195, 'progress']
         ];
 
         var store = new Ext.data.ArrayStore({
-            fields: ['rank','name','membership','indexed','progress','progressState'],
+            fields: ['rank','name','membership','indexed','processedCount','queueTotal','queueState'],
             data: data
         });
         this.store = store;
@@ -724,20 +726,40 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
         var toggleRenderer = function (v, m, rec) {
             return '<div class="fl-toggle ' + (v ? 'fl-on' : 'fl-off') + '" data-rowid="' + rec.id + '"><span class="fl-toggle-knob"></span></div>';
         };
-        var progressRenderer = function (v, m, rec) {
-            var state = rec.get('progressState');
+        // Format integer with thousands separator (British/US style — comma)
+        var fmtNum = function (n) {
+            return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        };
+        var queueRenderer = function (v, m, rec) {
+            var state = rec.get('queueState');
             if (state === 'excluded') {
-                return '<div class="fl-prog-excluded"><span class="fl-prog-info">\u24D8</span> Excluded from Index</div>';
+                return '<div class="fl-q-excluded"><span class="fl-q-info">\u24D8</span> Excluded from index</div>';
             }
-            var cls = (state === 'done') ? 'fl-prog-done' : 'fl-prog-active';
-            var icon = (state === 'done')
-                ? '<span class="fl-prog-check">\u2714</span>'
-                : '<span class="fl-prog-clock">\u25F7</span>';
+            var processed = rec.get('processedCount');
+            var total     = rec.get('queueTotal');
+            var label, icon, cls;
+            if (state === 'done') {
+                label = 'Organised';
+                cls   = 'fl-q-done';
+                icon  = '<span class="fl-q-tick">\u2714</span>';
+            } else if (state === 'queued') {
+                label = 'Initialised';
+                cls   = 'fl-q-queued';
+                icon  = '<span class="fl-q-clock">\u25F7</span>';
+            } else {
+                label = 'Indexing';
+                cls   = 'fl-q-active';
+                icon  = '<span class="fl-q-clock">\u25F7</span>';
+            }
             return '' +
-                '<div class="fl-prog-wrap">' +
-                  '<div class="fl-prog-bar"><div class="fl-prog-fill ' + cls + '" style="width:' + v + '%"></div></div>' +
-                  '<span class="fl-prog-pct">' + v + '%</span>' +
-                  icon +
+                '<div class="fl-q-wrap ' + cls + '">' +
+                    '<span class="fl-q-count">' +
+                        '<span class="fl-q-done-num">' + fmtNum(processed) + '</span>' +
+                        '<span class="fl-q-sep"> / </span>' +
+                        '<span class="fl-q-total">' + fmtNum(total) + '</span>' +
+                    '</span>' +
+                    '<span class="fl-q-label">' + label + '</span>' +
+                    icon +
                 '</div>';
         };
 
@@ -749,8 +771,8 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 { id: 'col-ws',
                   header: 'WORKSPACE NAME',    dataIndex: 'name',       width: 380, renderer: nameRenderer },
                 { header: 'MEMBERSHIP',        dataIndex: 'membership', width: 130, align: 'center', renderer: membershipRenderer },
-                { header: 'INDEX FOR AI CHAT', dataIndex: 'indexed',    width: 150, align: 'center', renderer: toggleRenderer },
-                { header: 'INDEXING PROGRESS', dataIndex: 'progress',   width: 240, renderer: progressRenderer }
+                { header: 'INDEX FOR AI CHAT', dataIndex: 'indexed',        width: 150, align: 'center', renderer: toggleRenderer },
+                { header: 'QUEUE STATUS',      dataIndex: 'processedCount', width: 260, renderer: queueRenderer }
             ]
         });
 
@@ -839,13 +861,18 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 var nowOn = !rec.get('indexed');
                 rec.set('indexed', nowOn);
                 if (nowOn) {
-                    if (rec.get('progressState') === 'excluded') {
-                        rec.set('progress', 0);
-                        rec.set('progressState', 'progress');
+                    if (rec.get('queueState') === 'excluded') {
+                        // Re-include: put back into the queue, nothing processed yet.
+                        // Use a deterministic-ish total so the mock looks plausible.
+                        var total = 800 + ((rec.get('rank') * 137) % 2400);
+                        rec.set('processedCount', 0);
+                        rec.set('queueTotal',     total);
+                        rec.set('queueState',     'queued');
                     }
                 } else {
-                    rec.set('progress', 0);
-                    rec.set('progressState', 'excluded');
+                    rec.set('processedCount', 0);
+                    rec.set('queueTotal',     0);
+                    rec.set('queueState',     'excluded');
                 }
                 rec.commit();
                 return;
@@ -985,6 +1012,31 @@ Ext.onReady(function () {
         });
         sendBtn.addEventListener('click', sendMessage);
     }
+
+    // ── Workspace indexing pill — animate count-up to feel live ──────
+    (function () {
+        var pill = document.getElementById('fl-index-status');
+        if (!pill) { return; }
+        var doneEl  = pill.querySelector('.fl-index-status-done');
+        var totalEl = pill.querySelector('.fl-index-status-total');
+        var lblEl   = pill.querySelector('.fl-index-status-label');
+        if (!doneEl || !totalEl) { return; }
+        function parseNum(s) { return parseInt(String(s).replace(/,/g, ''), 10) || 0; }
+        function fmt(n)      { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+        var done  = parseNum(doneEl.innerHTML);
+        var total = parseNum(totalEl.innerHTML);
+        var timer = setInterval(function () {
+            if (done >= total) {
+                clearInterval(timer);
+                pill.className = 'fl-index-status fl-done';
+                if (lblEl) { lblEl.innerHTML = 'Organised'; }
+                return;
+            }
+            // Step by a small variable amount so it visibly ticks.
+            done = Math.min(total, done + Math.max(1, Math.round((total - done) * 0.015)));
+            doneEl.innerHTML = fmt(done);
+        }, 900);
+    })();
 });
 
 
