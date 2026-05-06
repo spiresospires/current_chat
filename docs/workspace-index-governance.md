@@ -1,45 +1,159 @@
-# Index Governance
+# AI Index Governance
 
-Managed via the **Administration** nav-tab → **Company Information** → **AI Indexing** tile.
+## 🎯 Job Story
+When administering AI indexing,
+I want to control which workspaces are indexed,
+so that I can manage governance, privacy, and indexing priority.
 
-## Admin content header
+---
 
-Shown above the AI Indexing grid, matching the standard FusionLive admin
-heading pattern used elsewhere (e.g. *Manage Company Workspaces*):
+# 🧾 Description
 
-- **Administration** tab — small navy (`#1a237e`) tab on a white background,
-  bold white text, no border-radius, sits flush against the left edge.
-- **AI Indexing Configuration** sub-heading — bold dark text on a white
-  strip directly below the tab, separated from the tab by a thin divider
-  and from the content below by a 1px border.
+AI Index Governance is managed via:
 
-Implemented as a north-region `Ext.Panel` with class `fl-admin-content-hd`
-inside `FusionLive.AiIndexingPanel`'s border layout. There is no panel
-title and no custom dark blue header bar.
+Administration → Company Information → AI Indexing
 
-## Priority controls
+This area controls:
+- workspace inclusion
+- indexing priority
+- queue visibility
 
-The Priority Controls card (top-right of the toolbar) contains **four**
-icon-only buttons in this order:
+---
 
-1. **Move to top** — solid bar above ▲
-2. **Move up** — ▲
-3. **Move down** — ▼
-4. **Move to bottom** — solid bar below ▼
+# ✅ Functional Requirements
 
-Buttons share the `.fl-prio-btn` class (28×28, white, 1px border, navy
-hover). The bar in the edge buttons is drawn with a `::before` /
-`::after` pseudo-element pinned to the top/bottom of the button so the
-triangle stays vertically centred and the bar stays horizontally aligned
-with the triangle's optical centre (the ▲ and ▼ glyphs sit slightly
-differently in their cells, so each bar has its own `left` offset).
+## FR1 — Workspace Inclusion
+Administrators shall be able to:
+- enable indexing
+- disable indexing
 
-Behaviour:
+using a toggle control.
 
-- **Move to top / bottom** — `moveToEdge('top'|'bot')` removes selected
-  rows in document order (reversed for `bot`) and re-inserts them at the
-  start/end of the store, then calls `refreshRanks`.
-- **Move up / down** — `moveSelected('up'|'down')` shifts each selected
-  row by one position, then calls `refreshRanks`.
-- The previous **refresh** (↻) button has been removed; rank rebuilding
-  happens automatically after every move.
+---
+
+## FR2 — Inclusion Behaviour
+When enabled:
+- workspace is included in indexing
+- if previously paused, indexing **resumes from the last processed position** (never restarts from scratch)
+- if never previously indexed, indexing is initialised
+
+When disabled:
+- in-progress indexing for the workspace stops
+- already-processed index data is **preserved**, not discarded
+- the workspace is marked as `Paused`
+
+---
+
+## FR2a — Pause / Resume Persistence
+While a workspace is in the `Paused` state, the system shall retain:
+- processed document count
+- total queued count
+- prior indexing rank
+
+On re-enable, the resumed state is determined from the retained counts:
+- `processed >= total` → `Organised`
+- `0 < processed < total` → `Indexing`
+- `processed == 0` → `Initialised`
+
+---
+
+## FR3 — Priority Management
+Administrators shall be able to:
+- move to top
+- move up
+- move down
+- move to bottom
+
+within the indexing queue.
+
+The controls shall be presented as **icon-only buttons** (no labels, no manual refresh button). Rank rebuilding is automatic — see FR4.
+
+---
+
+## FR4 — Automatic Rank Updates
+The system shall:
+- automatically recalculate ranking
+- avoid requiring manual refresh
+
+---
+
+## FR5 — Queue Status
+The system shall display:
+- processed count
+- total count
+- indexing state
+
+---
+
+## FR6 — Status Representation
+Status shall be represented using:
+- status chips
+- text counters
+
+not progress bars.
+
+Distinct queue states shall be visually represented:
+- `Indexing` — in-progress (navy chip)
+- `Initialised` — queued, not yet started (amber chip)
+- `Organised` — complete (green chip with tick)
+- `Paused` — administrator-disabled, progress retained (grey chip with pause glyph)
+- `Excluded from index` — never indexed (italic muted text)
+
+---
+
+## FR7 — Admin View Layout
+The AI Indexing administration view shall follow the standard FusionLive admin pattern, consistent with views such as *Manage Company Workspaces*:
+- a small **Administration** tab in the brand navy colour, flush left
+- a bold **AI Indexing Configuration** sub-heading directly below the tab
+- the workspace grid below the sub-heading
+
+No custom coloured header strip is used.
+
+---
+
+# ✅ Acceptance Criteria
+
+## AC1 — Enable Indexing
+Given indexing is disabled
+When the admin enables indexing
+Then the workspace becomes indexable
+
+---
+
+## AC2 — Disable Indexing
+Given indexing is enabled and partially processed
+When the admin disables indexing
+Then future indexing is stopped
+And already-processed index data is retained
+And the workspace is shown as `Paused`
+
+---
+
+## AC2a — Resume Indexing
+Given a workspace is `Paused` with N documents already processed
+When the admin re-enables indexing
+Then indexing resumes from document N + 1
+And no previously processed work is repeated
+
+---
+
+## AC3 — Reorder Priority
+Given multiple indexed workspaces
+When the admin changes order
+Then ranking updates automatically
+
+---
+
+## AC4 — Queue Status
+Given indexing is active
+Then status counters and chips are visible
+
+---
+
+# 🔒 Non-Functional Requirements
+
+## Security
+- Only authorised admins may manage indexing
+
+## Stability
+- Queue reorder actions must not corrupt ranking state
