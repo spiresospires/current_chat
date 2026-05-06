@@ -1,0 +1,3 @@
+# Navigation
+
+Opens Document Details.
