@@ -69,3 +69,49 @@ Moved `#fl-input-area` from page-level sibling to inside the right panel body so
 ### Border-layout container background override
 - `css/styles.css` — `.fl-chat-panel .x-border-layout-ct { background: #fff !important; }` to remove the default light blue-grey strip Ext renders below the regions/splitter.
 
+
+
+### Administration view (Workspace AI Indexing Configuration)
+
+Brand-new top-level view shown when the **Administration** nav-tab is clicked. Lives alongside (not inside) the Chat view; nav-tab handler swaps containers.
+
+**HTML — `index.html`**
+- Added `<div id="fl-admin-container" style="display:none;">` next to `#fl-chat-container`.
+- Added small workspace indexing pill inside `#fl-input-area` (top-right): `Indexing 1,487 / 1,750 · Hinkley Point C` — non-intrusive live counter for the current workspace.
+
+**JS — `js/app.js` new components**
+- `FusionLive.AdminSideMenu` (west, 230px) — accordion of admin sections; "Company Information" expanded by default with icon-tile sub-items in a 2-col grid; "AI Indexing" tile is `.fl-active`. Click section header toggles `.fl-open`; click tile fires `tileclick` and updates active state.
+- `FusionLive.AiIndexingPanel` (center) — border layout: white header strip ("AI Indexing Configuration") north + content center. Content has `tbar` (title block + Priority Controls card with ▲ ▼ ↻) and `bbar` (page label + CSV link + record count).
+- `FusionLive.AdminPanel` — wraps the two in a border layout with a 4px splitter.
+- Bootstrap `Ext.onReady` rewired: `showChat()` / `showAdmin()` swap container visibility; admin panel is lazy-rendered on first visit; chat input area is reparented into the chat container while admin is visible so it doesn't bleed through.
+
+**Grid — `FusionLive.AiIndexingPanel`**
+- Columns: Select (CheckboxSelectionModel) | RANK (blue, dimmed when excluded) | WORKSPACE NAME (with green/grey status dot) | MEMBERSHIP (italic) | INDEX FOR AI CHAT (toggle switch) | QUEUE STATUS.
+- 20 mock workspaces.
+- Toggle interaction: clicking flips `indexed` and re-categorises queue state (`excluded` ↔ `queued`/`progress`).
+- Priority controls: select rows then ▲/▼ to reorder; ↻ rebuilds rank numbers.
+
+**Queue Status column (replaces former progress bar)**
+- Mock data fields: `processedCount`, `queueTotal`, `queueState` (`done` | `progress` | `queued` | `excluded`).
+- Renders as text counter `1,487 / 1,750` — first number bold navy 14px, slash muted, total smaller (12px) muted grey.
+- Status chip beside the counter: **Indexing** (navy chip), **Organised** (green chip + ✔) when complete, **Initialised** (amber chip + ◷) when queued. Excluded rows show italic "Excluded from index".
+- British English labels throughout (Indexing, Initialised, Organised).
+
+**Chat-side indexing pill (`#fl-index-status`)**
+- Small rounded pill anchored top-right of input area; pulsing navy dot + label + counter + workspace name.
+- IIFE in `Ext.onReady` increments `processedCount` every 900ms (`+1.5%` of remaining each tick); on completion the dot turns green, animation stops, label flips to **Organised**.
+
+**CSS — `css/styles.css`**
+- `#fl-admin-container { position: absolute; top: 115px; ... }` — same chrome offset as chat container.
+- `.fl-admin-side` accordion + 2-col tile grid styles; navy hover/active.
+- `.fl-ai-header` — clean **white** strip with navy text + bottom border (rejected the original purple-blue `#4a5cd0` background).
+- `.fl-ai-grid` — restyled to match the chat response doc-list card: 6px radius, soft `#dde2ef` border, alt-row `#f7f8fc`, hover `#eef2ff`, selected `#e3ebff`, no vertical cell borders, tight 10×8 padding.
+- `.fl-prio-card` — bordered pill with three ▲ ▼ ↻ icon-buttons.
+- `.fl-toggle` — 38×20 pill switch; navy `#1a237e` when on (unified with brand colour, was `#4a5cd0`).
+- `.fl-q-*` — Queue Status text styles (replaces removed `.fl-prog-*` progress-bar styles); chip colours per state.
+- `.fl-index-status` — chat-side pill with `@keyframes fl-index-pulse` ring animation; `.fl-done` modifier swaps to green non-animated.
+
+## Key gotchas (this round)
+- **Ext 3 grid renderers** can read sibling fields via `rec.get('fieldName')` — used to drive renderer output from `queueState` while the column's `dataIndex` is `processedCount`.
+- **Header strip colour**: the first `#4a5cd0` purple-blue felt out-of-palette next to the existing navy `#1a237e` / `#002060`. Resolved by making the header white with navy text and a single `border-bottom`. Same swap unified the toggle-on and (former) progress-bar colours to `#1a237e`.
+- **Container swap**: hiding `#fl-chat-container` is not enough — `#fl-input-area` is `position:absolute` to the page, so it must be reparented into the chat container before showing admin, otherwise it floats over the admin grid.
