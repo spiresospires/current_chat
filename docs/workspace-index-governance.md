@@ -27,7 +27,7 @@ Administrators shall be able to:
 - enable indexing
 - disable indexing
 
-using a toggle control.
+using the `AI CHAT` toggle control.
 
 ---
 
@@ -51,8 +51,8 @@ While a workspace is in the `Paused` state, the system shall retain:
 - prior indexing rank
 
 On re-enable, the resumed state is determined from the retained counts:
-- `processed >= total` → `Organised`
-- `0 < processed < total` → `Indexing`
+- `processed >= total` → `Indexed`
+- `0 < processed < total` → `Partial`
 - `processed == 0` → `Initialised`
 
 ---
@@ -77,7 +77,7 @@ The system shall:
 
 ---
 
-## FR5 — Queue Status
+## FR5 — Index Status
 The system shall display:
 - processed count
 - total count
@@ -93,9 +93,9 @@ Status shall be represented using:
 not progress bars.
 
 Distinct queue states shall be visually represented:
-- `Indexing` — in-progress (navy chip)
+- `Partial` — in-progress (navy chip)
 - `Initialised` — queued, not yet started (amber chip)
-- `Organised` — complete (green chip with tick)
+- `Indexed` — complete (green chip with tick)
 - `Paused` — administrator-disabled, progress retained (grey chip with pause glyph)
 - `Excluded from index` — never indexed (italic muted text)
 
@@ -144,9 +144,16 @@ Then ranking updates automatically
 
 ---
 
-## AC4 — Queue Status
+## AC4 — Index Status
 Given indexing is active
 Then status counters and chips are visible
+
+---
+
+## AC5 — Column and Toggle Labels
+Given the AI indexing grid is visible
+Then the toggle column header reads `AI CHAT`
+And the status column header reads `INDEX STATUS`
 
 ---
 
