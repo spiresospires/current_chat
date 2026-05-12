@@ -306,19 +306,30 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-ai-index, .fl-ai-index .x-panel-body { background: #fff; }
 .fl-ai-content, .fl-ai-content .x-panel-body { background: #fff; }
 
-/* Header strip — clean white, matches rest of app chrome */
-.fl-ai-header, .fl-ai-header .x-panel-body {
+/* Admin content header — 'Administration' tab + sub-heading */
+.fl-admin-content-hd, .fl-admin-content-hd .x-panel-body {
     background: #fff !important;
-    color: #1a237e;
-    border: none;
-    border-bottom: 1px solid #e0e3eb !important;
+    border: none !important;
+    border-bottom: 1px solid #d0d4e0 !important;
+    padding: 0 !important;
 }
-.fl-ai-header-inner {
-    display: flex; align-items: center; height: 42px;
-    padding: 0 18px; font-size: 14px; font-weight: bold; letter-spacing: .3px;
-    color: #1a237e;
+.fl-ach-tab {
+    display: inline-block;
+    background: #1a237e;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 7px 18px 7px 16px;
+    margin: 0;
+    letter-spacing: .2px;
 }
-.fl-ai-header-icon { margin-right: 8px; font-size: 16px; color: #1a237e; }
+.fl-ach-sub {
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #222;
+    border-top: 1px solid #e0e3eb;
+}
 
 /* Top toolbar (title + priority controls) */
 .fl-ai-topbar.x-toolbar, .fl-ai-topbar .x-toolbar-ct {
@@ -346,11 +357,19 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-prio-btn {
     width: 28px; height: 28px;
     border: 1px solid #c8cee0; background: #fff; border-radius: 4px;
-    color: #4a5570; font-size: 12px; cursor: pointer;
+    color: #4a5570; font-size: 12px; line-height: 1; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
+    padding: 0; box-sizing: border-box; position: relative;
 }
 .fl-prio-btn:hover { background: #eef1f9; border-color: #1a237e; color: #1a237e; }
-.fl-prio-refresh { font-size: 16px; }
+.fl-prio-edge-ic { font-size: 12px; line-height: 1; }
+.fl-prio-btn[data-prio="top"]::before,
+.fl-prio-btn[data-prio="bot"]::after {
+    content: ''; position: absolute; transform: translateX(-50%);
+    width: 10px; height: 2px; background: currentColor; border-radius: 1px;
+}
+.fl-prio-btn[data-prio="top"]::before { top: 4px;    left: 50%; }
+.fl-prio-btn[data-prio="bot"]::after  { bottom: 5px; left: 52%; }
 
 /* Bottom toolbar */
 .fl-ai-bottombar.x-toolbar, .fl-ai-bottombar .x-toolbar-ct {
@@ -455,6 +474,9 @@ body { font-family: Arial, Helvetica, sans-serif; font-size: 13px; background: #
 .fl-q-wrap.fl-q-active  .fl-q-label { background: #e8ecf7; color: #1a237e; }
 .fl-q-wrap.fl-q-done    .fl-q-label { background: #e6f4ea; color: #2e7d32; }
 .fl-q-wrap.fl-q-queued  .fl-q-label { background: #fff3e0; color: #b35c00; }
+.fl-q-wrap.fl-q-paused  .fl-q-label { background: #ececf2; color: #5a6480; }
+.fl-q-wrap.fl-q-paused .fl-q-done-num { color: #5a6480; }
+.fl-q-pause { color: #5a6480; font-size: 13px; }
 .fl-q-wrap.fl-q-done .fl-q-done-num { color: #2e7d32; }
 
 .fl-q-tick  { color: #2ea043; font-size: 14px; }

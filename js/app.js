@@ -746,6 +746,10 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 label = 'Initialised';
                 cls   = 'fl-q-queued';
                 icon  = '<span class="fl-q-clock">\u25F7</span>';
+            } else if (state === 'paused') {
+                label = 'Paused';
+                cls   = 'fl-q-paused';
+                icon  = '<span class="fl-q-pause">\u23F8</span>';
             } else {
                 label = 'Indexing';
                 cls   = 'fl-q-active';
@@ -800,9 +804,10 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 { xtype: 'tbtext', text: '<div class="fl-prio-card">' +
                     '<div class="fl-prio-label">PRIORITY CONTROLS:</div>' +
                     '<div class="fl-prio-btns">' +
-                      '<button class="fl-prio-btn" data-prio="up" title="Move up">\u25B2</button>' +
+                      '<button class="fl-prio-btn" data-prio="top"  title="Move to top">\u25B2</button>' +
+                      '<button class="fl-prio-btn" data-prio="up"   title="Move up">\u25B2</button>' +
                       '<button class="fl-prio-btn" data-prio="down" title="Move down">\u25BC</button>' +
-                      '<button class="fl-prio-btn fl-prio-refresh" data-prio="refresh" title="Refresh">\u21BB</button>' +
+                      '<button class="fl-prio-btn" data-prio="bot"  title="Move to bottom">\u25BC</button>' +
                     '</div>' +
                   '</div>' }
             ]
@@ -818,29 +823,30 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
             ]
         });
 
-        // Header strip (the dark blue "AI Indexing Configuration" bar)
+        // Header: 'Administration' tab + 'AI Indexing Configuration' sub-heading
         var header = new Ext.Panel({
             border: false,
-            height: 42,
-            cls:    'fl-ai-header',
-            html:   '<div class="fl-ai-header-inner"><span class="fl-ai-header-icon">\u2699</span>AI Indexing Configuration</div>'
+            cls:    'fl-admin-content-hd',
+            html:   '<div class="fl-ach-tab">Administration</div>' +
+                    '<div class="fl-ach-sub">AI Indexing Configuration</div>'
         });
 
-        // Main container: header (north) + content (center)
+        // Main content panel
         var content = new Ext.Panel({
-            border: false,
-            layout: 'fit',
-            cls:    'fl-ai-content',
-            tbar:   topbar,
-            bbar:   bottombar,
-            items:  [grid]
+            region:    'center',
+            border:    false,
+            layout:    'fit',
+            cls:       'fl-ai-content',
+            tbar:      topbar,
+            bbar:      bottombar,
+            items:     [grid]
         });
 
         Ext.apply(this, {
             layout: 'border',
             items: [
-                Ext.apply(header, { region: 'north' }),
-                Ext.apply(content, { region: 'center' })
+                Ext.apply(header,  { region: 'north' }),
+                content
             ]
         });
 
@@ -861,18 +867,28 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 var nowOn = !rec.get('indexed');
                 rec.set('indexed', nowOn);
                 if (nowOn) {
-                    if (rec.get('queueState') === 'excluded') {
-                        // Re-include: put back into the queue, nothing processed yet.
-                        // Use a deterministic-ish total so the mock looks plausible.
-                        var total = 800 + ((rec.get('rank') * 137) % 2400);
+                    var st = rec.get('queueState');
+                    if (st === 'paused') {
+                        // Resume from where we left off.
+                        var processed = rec.get('processedCount');
+                        var total     = rec.get('queueTotal');
+                        if (total > 0 && processed >= total) {
+                            rec.set('queueState', 'done');
+                        } else if (processed > 0) {
+                            rec.set('queueState', 'progress');
+                        } else {
+                            rec.set('queueState', 'queued');
+                        }
+                    } else if (st === 'excluded') {
+                        // Re-include a never-indexed workspace: prime the queue.
+                        var newTotal = 800 + ((rec.get('rank') * 137) % 2400);
                         rec.set('processedCount', 0);
-                        rec.set('queueTotal',     total);
+                        rec.set('queueTotal',     newTotal);
                         rec.set('queueState',     'queued');
                     }
                 } else {
-                    rec.set('processedCount', 0);
-                    rec.set('queueTotal',     0);
-                    rec.set('queueState',     'excluded');
+                    // Pause: keep processedCount and queueTotal so we can resume.
+                    rec.set('queueState', 'paused');
                 }
                 rec.commit();
                 return;
@@ -881,8 +897,8 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
             if (prio) {
                 e.stopEvent();
                 var act = prio.getAttribute('data-prio');
-                if (act === 'up' || act === 'down') { me.moveSelected(act); }
-                else if (act === 'refresh')         { me.refreshRanks(); }
+                if (act === 'up' || act === 'down')   { me.moveSelected(act); }
+                else if (act === 'top' || act === 'bot') { me.moveToEdge(act); }
             }
         });
     },
@@ -901,6 +917,22 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
             if (ni < 0 || ni >= store.getCount()) { return; }
             store.remove(rec);
             store.insert(ni, rec);
+        });
+        this.refreshRanks();
+        sm.selectRecords(recs);
+    },
+
+    moveToEdge: function (edge) {
+        var sm    = this.grid.getSelectionModel();
+        var store = this.grid.getStore();
+        var recs  = sm.getSelections();
+        if (!recs.length) { return; }
+        recs.sort(function (a, b) { return store.indexOf(a) - store.indexOf(b); });
+        if (edge === 'bot') { recs.reverse(); }
+        var target = (edge === 'top') ? 0 : store.getCount() - 1;
+        Ext.each(recs, function (rec, i) {
+            store.remove(rec);
+            store.insert((edge === 'top') ? i : store.getCount(), rec);
         });
         this.refreshRanks();
         sm.selectRecords(recs);

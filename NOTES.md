@@ -91,6 +91,35 @@ Brand-new top-level view shown when the **Administration** nav-tab is clicked. L
 - Toggle interaction: clicking flips `indexed` and re-categorises queue state (`excluded` ↔ `queued`/`progress`).
 - Priority controls: select rows then ▲/▼ to reorder; ↻ rebuilds rank numbers.
 
+## Later refinements
+
+### Admin content header — match FusionLive admin pattern
+- Removed the custom dark-blue "AI Indexing Configuration" header strip and the gear icon.
+- Replaced with a north `Ext.Panel` (`fl-admin-content-hd`) holding two stacked elements that mirror the standard FusionLive admin layout (e.g. *Manage Company Workspaces*):
+  - **Administration** tab — small navy `#1a237e` block, bold white text, flush left, no border-radius.
+  - **AI Indexing Configuration** sub-heading — bold dark text on white, separated by a 1px divider above and below.
+- Removed the now-unused `.fl-ai-header` / `.fl-ai-header-inner` / `.fl-ai-header-icon` CSS.
+
+### Priority controls — 4 buttons, refresh removed
+- Replaced ▲ ▼ ↻ with **Move to top** (▲ + bar above), **Move up** (▲), **Move down** (▼), **Move to bottom** (▼ + bar below).
+- Bars are pure CSS (`::before` / `::after` on the button), pinned absolutely to the top/bottom — keeps the triangle perfectly vertically centred and gives matching stroke weight to the ▲▼ glyphs.
+- ▲ and ▼ glyphs sit slightly differently in their character cells, so each edge button has its own `left` offset (50% for top, 52% for bot) to keep the bar optically centred over the triangle.
+- New `moveToEdge('top'|'bot')` method on `FusionLive.AiIndexingPanel`. Refresh / `refreshRanks` is now invoked automatically after any move (no user-facing button).
+
+### Toggle off = pause (preserve progress), toggle on = resume
+Decision: when a user toggles **Index for AI Chat** off, the system stops indexing for that workspace **but does not discard already-processed data**. Toggling back on resumes from where it stopped, never re-starts from scratch.
+
+Implementation:
+- New `queueState` value `'paused'` (rendered as a grey `Paused ⏸` chip).
+- Toggle off: set `queueState = 'paused'`; **keep** `processedCount` and `queueTotal` intact.
+- Toggle on from `paused`:
+  - `processed >= total` → `done`
+  - `processed > 0`     → `progress`
+  - `processed === 0`   → `queued`
+- Toggle on from legacy `excluded` (never-indexed rows in the seed data) still primes a fresh queue.
+- The previous behaviour (zeroing counts and flipping to `excluded` on toggle off) was **removed** — the `excluded` state is now reserved for rows that have never been indexed.
+
+
 **Queue Status column (replaces former progress bar)**
 - Mock data fields: `processedCount`, `queueTotal`, `queueState` (`done` | `progress` | `queued` | `excluded`).
 - Renders as text counter `1,487 / 1,750` — first number bold navy 14px, slash muted, total smaller (12px) muted grey.
@@ -115,3 +144,4 @@ Brand-new top-level view shown when the **Administration** nav-tab is clicked. L
 - **Ext 3 grid renderers** can read sibling fields via `rec.get('fieldName')` — used to drive renderer output from `queueState` while the column's `dataIndex` is `processedCount`.
 - **Header strip colour**: the first `#4a5cd0` purple-blue felt out-of-palette next to the existing navy `#1a237e` / `#002060`. Resolved by making the header white with navy text and a single `border-bottom`. Same swap unified the toggle-on and (former) progress-bar colours to `#1a237e`.
 - **Container swap**: hiding `#fl-chat-container` is not enough — `#fl-input-area` is `position:absolute` to the page, so it must be reparented into the chat container before showing admin, otherwise it floats over the admin grid.
+
