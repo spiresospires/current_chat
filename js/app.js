@@ -739,7 +739,7 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
             var total     = rec.get('queueTotal');
             var label, icon, cls;
             if (state === 'done') {
-                label = 'Organised';
+                label = 'Indexed';
                 cls   = 'fl-q-done';
                 icon  = '<span class="fl-q-tick">\u2714</span>';
             } else if (state === 'queued') {
@@ -751,7 +751,7 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 cls   = 'fl-q-paused';
                 icon  = '<span class="fl-q-pause">\u23F8</span>';
             } else {
-                label = 'Indexing';
+                label = 'Partial';
                 cls   = 'fl-q-active';
                 icon  = '<span class="fl-q-clock">\u25F7</span>';
             }
@@ -775,8 +775,8 @@ FusionLive.AiIndexingPanel = Ext.extend(Ext.Panel, {
                 { id: 'col-ws',
                   header: 'WORKSPACE NAME',    dataIndex: 'name',       width: 380, renderer: nameRenderer },
                 { header: 'MEMBERSHIP',        dataIndex: 'membership', width: 130, align: 'center', renderer: membershipRenderer },
-                { header: 'INDEX FOR AI CHAT', dataIndex: 'indexed',        width: 150, align: 'center', renderer: toggleRenderer },
-                { header: 'QUEUE STATUS',      dataIndex: 'processedCount', width: 260, renderer: queueRenderer }
+                { header: 'AI CHAT',           dataIndex: 'indexed',        width: 150, align: 'center', renderer: toggleRenderer },
+                { header: 'INDEX STATUS',      dataIndex: 'processedCount', width: 260, renderer: queueRenderer }
             ]
         });
 
@@ -1061,7 +1061,7 @@ Ext.onReady(function () {
             if (done >= total) {
                 clearInterval(timer);
                 pill.className = 'fl-index-status fl-done';
-                if (lblEl) { lblEl.innerHTML = 'Organised'; }
+                if (lblEl) { lblEl.innerHTML = 'Indexed'; }
                 return;
             }
             // Step by a small variable amount so it visibly ticks.

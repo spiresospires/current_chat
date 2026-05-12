@@ -42,6 +42,10 @@ The system shall display:
 
 using an inline pill model.
 
+The inline pill uses the following labels:
+- `Partial` while indexing is in progress
+- `Indexed` when indexing is complete
+
 ---
 
 ## FR5 — Incomplete Index Handling
@@ -68,6 +72,13 @@ Then results only come from the active workspace
 ## AC3 — Status Visibility
 Given indexing is in progress
 Then the inline indexing pill displays status information
+And the status label reads `Partial`
+
+---
+
+## AC3a — Complete Status Label
+Given indexing is complete
+Then the inline indexing pill status label reads `Indexed`
 
 ---
 
